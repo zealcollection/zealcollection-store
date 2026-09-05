@@ -1,0 +1,229 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-onyx: #0f0f0f;
+    --color-gold: #e0b647;
+    --color-gold-light: #f0cf6c;
+    --color-gold-dark: #c89c33;
+    --color-ivory: #ffffff;
+    --color-mist: #f8f8f8;
+    --color-charcoal: #1a1a1a;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ivory text-onyx font-body antialiased;
+    font-family: "Inter", "Manrope", system-ui, sans-serif;
+  }
+
+  ::selection {
+    background-color: #e0b647;
+    color: #0f0f0f;
+  }
+}
+
+@layer components {
+  .btn-luxury {
+    @apply inline-flex items-center justify-center px-8 py-3.5 bg-onyx text-ivory
+      tracking-[0.2em] text-[11px] uppercase font-medium
+      transition-all duration-300 ease-out
+      hover:bg-gold hover:text-onyx;
+  }
+
+  .btn-luxury-outline {
+    @apply inline-flex items-center justify-center px-8 py-3.5 border border-onyx
+      text-onyx tracking-[0.2em] text-[11px] uppercase font-medium
+      transition-all duration-300 ease-out
+      hover:bg-onyx hover:text-ivory;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center px-8 py-3.5 bg-gold text-onyx
+      tracking-[0.2em] text-[11px] uppercase font-semibold
+      transition-all duration-300 ease-out
+      hover:bg-gold-dark;
+  }
+
+  .section-heading {
+    @apply font-display text-onyx;
+    letter-spacing: 0.02em;
+  }
+
+  .eyebrow {
+    @apply text-gold uppercase tracking-[0.35em] text-[11px] font-medium;
+  }
+
+  .link-underline {
+    position: relative;
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 1px;
+    background-color: #d4af37;
+    transition: width 0.3s ease;
+  }
+
+  .link-underline:hover::after {
+    width: 100%;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    max-width: 100vw;
+    animation: marquee 22s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-paused .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f8f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8962e;
+}
+
+/* Product image zoom on details page */
+.zoom-lens {
+  overflow: hidden;
+}
+
+.zoom-lens img {
+  transition: transform 0.5s ease;
+}
+
+.zoom-lens:hover img {
+  transform: scale(1.5);
+}
+
+/* Fade up utility used alongside Framer Motion */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+/* Graceful one-shot image reveal (paired with OptimisedImg) */
+@keyframes zoFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.zo-fade-in {
+  animation: zoFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Mobile composition for editorial media. Desktop sizing remains untouched. */
+@media (max-width: 767px) {
+  .homepage-hero {
+    min-height: 78svh;
+  }
+
+  .homepage-hero__media {
+    object-position: center 35%;
+    animation: none;
+  }
+
+  .edit-hero {
+    min-height: 76svh;
+  }
+
+  .edit-hero__media,
+  .editorial-hero__media,
+  .article-hero__media {
+    object-position: center center;
+  }
+
+  .editorial-hero__media,
+  .article-hero__media,
+  .blog-topic-image {
+    object-fit: contain;
+    background-color: #0f0f0f;
+  }
+
+  .editorial-hero {
+    min-height: 64svh;
+  }
+
+  .article-hero {
+    min-height: 68svh;
+  }
+
+  .home-bestsellers {
+    min-height: clamp(740px, calc(100vw + 300px), 900px);
+    padding: 0 1rem 3.5rem;
+  }
+
+  .home-bestsellers__backdrop {
+    display: none;
+  }
+
+  .home-bestsellers__slide {
+    inset: 0 1rem;
+  }
+
+  .home-bestsellers__grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    height: auto;
+  }
+
+  .home-bestsellers__image,
+  .home-bestsellers__details {
+    width: min(100%, 420px);
+  }
+
+  .home-bestsellers__image {
+    aspect-ratio: 4 / 5;
+    flex: none;
+    box-shadow: 0 16px 40px rgba(15, 15, 15, 0.08);
+  }
+
+  .home-bestsellers__details {
+    padding: 1.5rem 0.25rem 3.5rem;
+  }
+
+  .home-bestsellers__details h3 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .home-bestsellers > .absolute.bottom-0 {
+    right: 1rem;
+    bottom: 0.25rem;
+  }
+}
