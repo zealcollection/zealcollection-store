@@ -190,6 +190,7 @@ export default function AdminDashboard() {
                 ) : tab === "products" ? (
                   <ProductsTab
                     products={products}
+                    categories={categories}
                     refresh={refreshAll}
                     formOpen={productFormOpen}
                     setFormOpen={setProductFormOpen}
@@ -319,7 +320,7 @@ function AnalyticsTab({ analytics }) {
 // ------------------------------------------------------------------
 // Products tab
 // ------------------------------------------------------------------
-function ProductsTab({ products, refresh, formOpen, setFormOpen, editing, setEditing }) {
+function ProductsTab({ products, categories, refresh, formOpen, setFormOpen, editing, setEditing }) {
   const [deleteId, setDeleteId] = useState(null);
 
   const removeProduct = async (id) => {
@@ -432,7 +433,7 @@ function ProductsTab({ products, refresh, formOpen, setFormOpen, editing, setEdi
         {formOpen && (
           <ProductFormModal
             product={editing}
-            categories={productsCategories(products)}
+            categories={categories}
             onClose={() => {
               setFormOpen(false);
               setEditing(null);
@@ -455,17 +456,6 @@ function ProductsTab({ products, refresh, formOpen, setFormOpen, editing, setEdi
       </AnimatePresence>
     </div>
   );
-}
-
-// Extract unique categories from product list for the form dropdown
-function productsCategories(products) {
-  const seen = new Map();
-  products.forEach((p) => {
-    if (p.category?._id && !seen.has(p.category._id)) {
-      seen.set(p.category._id, p.category);
-    }
-  });
-  return Array.from(seen.values());
 }
 
 function ProductFormModal({ product, categories, onClose, onSaved }) {
@@ -512,15 +502,15 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.price || !form.category) {
-      toast.error("Please fill in name, price and category");
+    if (!form.name.trim() || !form.category) {
+      toast.error("Please fill in product name and category");
       return;
     }
     try {
       setSubmitting(true);
       const payload = {
         ...form,
-        price: parseFloat(form.price),
+        price: form.price.trim() === "" ? 0 : parseFloat(form.price),
         stock: parseInt(form.stock, 10) || 0,
         variants: form.variants
           .split(",")

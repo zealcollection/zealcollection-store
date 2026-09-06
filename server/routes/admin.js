@@ -98,15 +98,15 @@ router.post("/products", async (req, res) => {
       gender,
     } = req.body;
 
-    if (!name || !description || price === undefined || !category || !images || images.length === 0) {
-      return res.status(400).json({ message: "Please provide name, description, price, category and at least one image" });
+    if (!name || !category) {
+      return res.status(400).json({ message: "Please provide product name and category" });
     }
 
     const product = await Product.create({
       name,
       slug,
-      description,
-      price: Number(price),
+      description: description || "",
+      price: price === undefined || price === "" ? 0 : Number(price),
       stock: Number(stock) || 0,
       category,
       variants: variants || [],

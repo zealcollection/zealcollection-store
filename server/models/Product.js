@@ -5,12 +5,12 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, unique: true },
-    description: { type: String, required: true },
+    description: { type: String, default: "" },
     // Short elegant blurb shown on product cards and the Bestsellers section.
     // Edit it in the admin Products form ("Card Blurb" field). Falls back to
     // the first ~120 characters of the full description when empty.
     cardDescription: { type: String },
-    price: { type: Number, required: true, min: 0 },
+    price: { type: Number, default: 0, min: 0 },
     stock: { type: Number, required: true, default: 0, min: 0 },
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,7 +22,7 @@ const productSchema = new mongoose.Schema(
     // Option color/material names, e.g. ["Gold", "Silver"]
     colors: [{ type: String, trim: true }],
     // CLOUDINARY image URLs - paste your uploaded image URLs here
-    images: [{ type: String, required: true }],
+    images: [{ type: String }],
     // Optional per-photo labels: when one card holds several items (e.g.
     // different bags of the same line), label each photo so the shopper
     // adds exactly the item they selected, e.g. ["Monaco", "Savoy"].

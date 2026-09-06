@@ -32,7 +32,6 @@ const drawerLinks = [
   { label: "Shop", path: "/shop" },
   { label: "Men", path: "/men" },
   { label: "Ladies", path: "/ladies" },
-  { label: "Unisex", path: "/unisex" },
   { label: "Blog", path: "/blog" },
   { label: "About", path: "/about" },
   { label: "Contact", path: "/contact" },
@@ -180,7 +179,7 @@ export default function Navbar() {
                     // shopping pages; elsewhere Shop behaves as a normal
                     // link to the shop.
                     if (
-                      ["/shop", "/men", "/ladies", "/unisex"].includes(location.pathname)
+                      ["/shop", "/men", "/ladies"].includes(location.pathname)
                     ) {
                       e.preventDefault();
                       e.stopPropagation();
@@ -190,7 +189,7 @@ export default function Navbar() {
                   }}
                   aria-expanded={shopMenuOpen}
                   className={`text-[15px] tracking-[0.15em] uppercase font-semibold transition-colors duration-300 inline-flex items-center gap-1.5 ${
-                    ["/shop", "/men", "/ladies", "/unisex"].includes(location.pathname)
+                    ["/shop", "/men", "/ladies"].includes(location.pathname)
                       ? "text-gold-dark"
                       : solid
                       ? "text-onyx hover:text-gold-dark"
@@ -205,7 +204,7 @@ export default function Navbar() {
                 <div
                   onClick={(e) => e.stopPropagation()}
                   className={`absolute left-0 top-full pt-2 transition-all duration-300 ${
-                    ["/shop", "/men", "/ladies", "/unisex"].includes(location.pathname) && shopMenuOpen
+                    ["/shop", "/men", "/ladies"].includes(location.pathname) && shopMenuOpen
                       ? "opacity-100 visible translate-y-0"
                       : "opacity-0 invisible -translate-y-1"
                   }`}
@@ -227,9 +226,6 @@ export default function Navbar() {
                           <span className="text-[12px] tracking-[0.18em] uppercase font-semibold text-onyx group-hover/item:text-gold-dark transition-colors">
                             Men
                           </span>
-                          <span className="text-[10px] tracking-[0.12em] uppercase text-onyx/45 group-hover/item:text-gold-dark transition-colors">
-                            The men's edit
-                          </span>
                         </span>
                       </Link>
                       <Link
@@ -239,22 +235,6 @@ export default function Navbar() {
                         <span className="flex items-baseline justify-between gap-4">
                           <span className="text-[12px] tracking-[0.18em] uppercase font-semibold text-onyx group-hover/item:text-gold-dark transition-colors">
                             Ladies
-                          </span>
-                          <span className="text-[10px] tracking-[0.12em] uppercase text-onyx/45 group-hover/item:text-gold-dark transition-colors">
-                            The ladies' edit
-                          </span>
-                        </span>
-                      </Link>
-                      <Link
-                        to="/unisex"
-                      className="group/item block px-5 py-2.5 hover:bg-mist transition-colors"
-                    >
-                      <span className="flex items-baseline justify-between gap-3 min-w-0">
-                        <span className="text-[12px] tracking-[0.18em] uppercase font-semibold text-onyx group-hover/item:text-gold-dark transition-colors">
-                          Unisex
-                          </span>
-                          <span className="text-[10px] tracking-[0.12em] uppercase text-onyx/45 group-hover/item:text-gold-dark transition-colors">
-                            The shared edit
                           </span>
                         </span>
                       </Link>

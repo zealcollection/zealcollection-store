@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
@@ -13,16 +13,8 @@ import { DEMO_PRODUCTS, DEMO_CATEGORIES } from "../data/demoData";
 // The Ladies' Edit - a dedicated, fully animated landing page for the
 // ladies' collection. It owns its own route (/ladies) and never mixes
 // men's pieces into its grid. Category filtering is available for
-// refinement but the page is locked to gender=ladies.
+// The page is locked to gender=ladies and shows the complete ladies’ collection.
 // ------------------------------------------------------------------
-
-const EDITIONS = [
-  { label: "All", value: "" },
-  { label: "Accessories", value: "accessories" },
-  { label: "Handbags", value: "handbags" },
-  { label: "Watches", value: "watches" },
-  { label: "Apparel", value: "apparel" },
-];
 
 // ------------------------------------------------------------------
 // HERO BACKGROUND MEDIA - paste your Cloudinary URL(s) below.
@@ -64,12 +56,9 @@ const heroText = {
 };
 
 export default function Ladies() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
   const [categories, setCategories] = useState(DEMO_CATEGORIES);
   const [allProducts, setAllProducts] = useState(DEMO_PRODUCTS);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState(searchParams.get("category") || "");
 
   useEffect(() => {
     let cancelled = false;
@@ -99,36 +88,11 @@ export default function Ladies() {
     };
   }, []);
 
-  useEffect(() => {
-    const urlCategory = searchParams.get("category");
-    if (urlCategory !== category) {
-      setCategory(urlCategory || "");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.get("category")]);
-
   const filteredProducts = useMemo(() => {
     let result = [...allProducts];
-    if (category)
-      result = result.filter(
-        (p) =>
-          (typeof p.category === "string" && p.category === category) ||
-          p.category?.slug === category ||
-          p.categoryName === category
-      );
-    // Guarantee no men's pieces ever render on this page
-    result = result.filter((p) => !p.gender || p.gender === "ladies" || p.gender === "unisex");
+    result = result.filter((p) => p.gender === "ladies");
     return result;
-  }, [allProducts, category]);
-
-  const editionLinks = useMemo(
-    () =>
-      EDITIONS.map((ed) => ({
-        ...ed,
-        slug: ed.value || "all",
-      })),
-    []
-  );
+  }, [allProducts]);
 
   return (
     <>
@@ -215,42 +179,6 @@ export default function Ladies() {
 
           {/* Gold hairline at the base */}
           <div className="h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
-        </section>
-
-        {/* ------------------------------------------------------------------
-            EDITION TABS - slim, quiet, gold underline on the active edition
-        ------------------------------------------------------------------ */}
-        <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-10 md:pt-14">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-wrap items-center gap-x-7 gap-y-3 border-b border-mist"
-          >
-            {editionLinks.map((ed) => (
-              <button
-                key={ed.value}
-                type="button"
-                onClick={() => {
-                  setCategory(ed.value);
-                  const params = new URLSearchParams(searchParams);
-                  if (ed.value) params.set("category", ed.value);
-                  else params.delete("category");
-                  setSearchParams(params);
-                }}
-                className={`text-[11px] tracking-[0.28em] uppercase pb-3.5 font-semibold transition-colors duration-300 ${
-                  category === ed.value
-                    ? "text-gold-dark border-b-2 border-gold"
-                    : "text-onyx/50 hover:text-onyx"
-                }`}
-              >
-                {ed.label}
-              </button>
-            ))}
-            <span className="ml-auto text-[11px] tracking-[0.15em] uppercase text-onyx/50 pb-3.5">
-              {filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"}
-            </span>
-          </motion.div>
         </section>
 
         {/* ------------------------------------------------------------------

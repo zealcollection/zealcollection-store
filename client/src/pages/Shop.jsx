@@ -240,62 +240,17 @@ export default function Shop() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/70" />
         {/* Subtle gold light sweep */}
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(224,182,71,0.05)_50%,transparent_100%)]" />
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          className="absolute bottom-12 md:bottom-16 left-4 sm:left-8 lg:left-16 z-10 flex flex-wrap items-center gap-x-7 gap-y-3"
-        >
-          {["men", "ladies", "unisex"].map((g) => (
-            <Link
-              key={g}
-              to={`/${g}`}
-              className="inline-flex items-center gap-3 text-ivory/85 hover:text-gold text-[11px] tracking-[0.25em] uppercase font-semibold transition-colors duration-300"
-            >
-              {g === "men" ? "The men's edit" : g === "ladies" ? "The ladies' edit" : "The shared edit"}
-            </Link>
-          ))}
-        </motion.div>
-
         {/* Gold hairline at the base */}
         <div className="h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
       </section>
 
-      {/* Tab bar section - audience and category filters */}
+      {/* Clean category filter bar - categories are managed in the admin panel. */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-10 md:pt-14">
-      {/* Audience tabs - Men / Ladies, driven by the gender field set in
-            the admin product form. Works together with the category tabs below. */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-10 border-b border-mist"
-        >
-          {[
-            { label: "Men", href: "/men", note: "The men's edit" },
-            { label: "Ladies", href: "/ladies", note: "The ladies' edit" },
-            { label: "Unisex", href: "/unisex", note: "The shared edit" },
-          ].map((tab) => (
-            <Link
-              key={tab.href}
-              to={tab.href}
-              className="group/tab text-[12px] tracking-[0.25em] uppercase pb-3 font-semibold transition-colors duration-300 text-onyx/50 hover:text-gold-dark flex items-baseline gap-2.5"
-            >
-              {tab.label}
-              <span className="text-[10px] tracking-[0.12em] uppercase text-onyx/35 group-hover/tab:text-gold-dark/70 transition-colors">
-                {tab.note}
-              </span>
-            </Link>
-          ))}
-        </motion.div>
-
-        {/* Category tabs - driven by the live categories from the database
-            (managed in the admin Categories tab). "All" is always first. */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-10 border-b border-mist pb-0"
+          className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-3 border-b border-mist pb-0"
         >
           {[
             { label: "All", value: "" },
