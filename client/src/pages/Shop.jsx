@@ -37,7 +37,7 @@ const SORT_OPTIONS = [
 // looping muted video. Recommended size: 2560 x 1440 px landscape.
 // Both can be used together (image shows while the video loads).
 // ------------------------------------------------------------------
-const HERO_IMAGE_URL = ""; // CLOUDINARY: edits/shop-hero.jpg
+const HERO_IMAGE_URL = "https://res.cloudinary.com/z0afpk9x/image/upload/v1788653626/H.jpg"; // CLOUDINARY: edits/shop-hero.jpg
 const HERO_VIDEO_URL = ""; // CLOUDINARY (optional): edits/shop-hero.mp4
 
 const COLOR_OPTIONS = [
