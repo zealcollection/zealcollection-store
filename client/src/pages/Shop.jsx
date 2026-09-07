@@ -1,27 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  SlidersHorizontal,
-  X,
-  ChevronDown,
-} from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 
 import SEO from "../components/SEO";
 import { imgHero } from "../lib/imageOpt";
 import ProductCard, { formatPrice } from "../components/ProductCard";
 import { productsAPI, categoriesAPI } from "../lib/api";
 import { DEMO_PRODUCTS, DEMO_CATEGORIES } from "../data/demoData";
-
-const PRICE_OPTIONS = [
-  { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under 300", min: 0, max: 300 },
-  { label: "300 - 600", min: 300, max: 600 },
-  { label: "600 - 1000", min: 600, max: 1000 },
-  { label: "1000 - 2000", min: 1000, max: 2000 },
-  { label: "Above 2000", min: 2000, max: Infinity },
-];
 
 const SORT_OPTIONS = [
   { value: "", label: "Featured" },
@@ -40,37 +26,22 @@ const SORT_OPTIONS = [
 const HERO_IMAGE_URL = "https://res.cloudinary.com/z0afpk9x/image/upload/v1788653626/H.jpg"; // CLOUDINARY: edits/shop-hero.jpg
 const HERO_VIDEO_URL = ""; // CLOUDINARY (optional): edits/shop-hero.mp4
 
-const COLOR_OPTIONS = [
-  "Black",
-  "Gold",
-  "Silver",
-  "Rose Gold",
-  "White Gold",
-  "Camel",
-  "Ivory",
-  "Midnight",
-  "Champagne",
-  "Blush",
-  "Graphite",
-];
-
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [categories, setCategories] = useState(DEMO_CATEGORIES);
-  const [allProducts, setAllProducts] = useState(DEMO_PRODUCTS);
+  // NOTE: both of these now start EMPTY (not DEMO_CATEGORIES / DEMO_PRODUCTS)
+  // so the old demo data never flashes on screen before the real data
+  // arrives from the API - same fix as the Home page. See `categoriesList`
+  // and `productsForDisplay` below, which only fall back to the demo data
+  // once loading has finished (e.g. the API call genuinely failed).
+  const [categories, setCategories] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [gender, setGender] = useState(searchParams.get("gender") || "");
-  const [brand, setBrand] = useState("");
-  const [color, setColor] = useState("");
-  const [priceRange, setPriceRange] = useState(PRICE_OPTIONS[0]);
-  const [availability, setAvailability] = useState("");
   const [sort, setSort] = useState("");
   const [search, setSearch] = useState(searchParams.get("search") || "");
-
-  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,8 +92,17 @@ export default function Shop() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams.get("search")]);
 
+  // Categories to render: real ones once fetched, otherwise fall back to
+  // the demo set ONLY after loading has finished (e.g. API failed). This
+  // keeps the demo category tabs from ever flashing before the real fetch
+  // resolves - the same fix used on the Home page.
+  const categoriesList = categories.length > 0 ? categories : loading ? [] : DEMO_CATEGORIES;
+
+  // Same treatment for products, for consistency with the categories fix.
+  const productsForDisplay = allProducts.length > 0 ? allProducts : loading ? [] : DEMO_PRODUCTS;
+
   const filteredProducts = useMemo(() => {
-    let result = [...allProducts];
+    let result = [...productsForDisplay];
 
     if (search.trim()) {
       const term = search.trim().toLowerCase();
@@ -143,25 +123,6 @@ export default function Shop() {
       const allowed = gender === "all" ? ["men", "ladies", "unisex"] : [gender, "unisex"];
       result = result.filter((p) => allowed.includes(p.gender || "unisex"));
     }
-    if (brand) {
-      result = result.filter((p) => p.brand === brand);
-    }
-    if (color) {
-      result = result.filter((p) =>
-        (p.colors || []).some((c) => c.toLowerCase() === color.toLowerCase())
-      );
-    }
-    if (priceRange.min > 0 || priceRange.max < Infinity) {
-      result = result.filter(
-        (p) => p.price >= priceRange.min && p.price <= priceRange.max
-      );
-    }
-    if (availability === "in-stock") {
-      result = result.filter((p) => (p.stock || 0) > 0);
-    }
-    if (availability === "sold-out") {
-      result = result.filter((p) => (p.stock || 0) === 0);
-    }
 
     switch (sort) {
       case "newest":
@@ -181,43 +142,14 @@ export default function Shop() {
     }
 
     return result;
-  }, [allProducts, search, category, gender, brand, color, priceRange, availability, sort]);
-
-  // NOTE: `gender` is now included here. Arriving on /shop from the Men's
-  // or Ladies' edit ("Shop the edit") applies a gender filter that used to
-  // be completely invisible - it wasn't counted as an active filter and
-  // had no chip to remove it, so browsing other categories could silently
-  // return "No Products Found" with no way to tell why. Counting it here
-  // makes the active-filters row (and its "Clear All") appear whenever a
-  // gender restriction is in effect, on both mobile and desktop.
-  const activeFilterCount = [
-    category,
-    gender,
-    brand,
-    color,
-    availability,
-    priceRange.min > 0 || priceRange.max < Infinity ? "price" : "",
-  ].filter(Boolean).length;
+  }, [productsForDisplay, search, category, gender, sort]);
 
   const clearAllFilters = () => {
     setGender("");
     setCategory("");
-    setBrand("");
-    setColor("");
-    setPriceRange(PRICE_OPTIONS[0]);
-    setAvailability("");
     setSort("");
     setSearch("");
     setSearchParams({});
-  };
-
-  // Removes just the gender restriction (e.g. leftover from visiting the
-  // Men's/Ladies' edit) while keeping any other active filters intact.
-  const removeGenderFilter = () => {
-    setGender("");
-    const params = new URLSearchParams(searchParams);
-    params.delete("gender");
-    setSearchParams(params);
   };
 
   return (
@@ -263,47 +195,53 @@ export default function Shop() {
 
       {/* Clean category filter bar - categories are managed in the admin panel. */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-10 md:pt-14">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-3 border-b border-mist pb-0"
-        >
-          {[
-            { label: "All", value: "" },
-            ...categories.map((c) => ({ label: c.name, value: c.slug })),
-          ].map((tab) => (
-            <button
-              key={tab.value}
-              type="button"
-              onClick={() => {
-                setCategory(tab.value);
-                // These top-level tabs are a general "shop by category"
-                // control, not a gender-scoped one - so using them should
-                // drop any leftover gender restriction from arriving here
-                // via the Men's/Ladies' edit ("Shop the edit"). Otherwise
-                // a category tab can silently combine with that hidden
-                // gender filter and return "No Products Found".
-                setGender("");
-                const params = new URLSearchParams(searchParams);
-                if (tab.value) params.set("category", tab.value);
-                else params.delete("category");
-                params.delete("gender");
-                setSearchParams(params);
-              }}
-              className={`text-[11px] tracking-[0.2em] uppercase pb-3.5 transition-colors duration-300 ${
-                category === tab.value
-                  ? "text-onyx border-b-2 border-gold"
-                  : "text-onyx/50 hover:text-onyx"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-          <span className="ml-auto text-[11px] tracking-[0.15em] uppercase text-onyx/50 pb-3.5">
-            {filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"}
-          </span>
-        </motion.div>
+        {loading && categoriesList.length === 0 ? (
+          <div className="flex items-center gap-6 mt-3 border-b border-mist pb-3.5">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-3 w-16 bg-mist animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-3 border-b border-mist pb-0"
+          >
+            {[
+              { label: "All", value: "" },
+              ...categoriesList.map((c) => ({ label: c.name, value: c.slug })),
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => {
+                  setCategory(tab.value);
+                  // These top-level tabs are a general "shop by category"
+                  // control, not a gender-scoped one - so using them drops
+                  // any leftover gender restriction from arriving here via
+                  // the Men's/Ladies' edit ("Shop the edit").
+                  setGender("");
+                  const params = new URLSearchParams(searchParams);
+                  if (tab.value) params.set("category", tab.value);
+                  else params.delete("category");
+                  params.delete("gender");
+                  setSearchParams(params);
+                }}
+                className={`text-[11px] tracking-[0.2em] uppercase pb-3.5 transition-colors duration-300 ${
+                  category === tab.value
+                    ? "text-onyx border-b-2 border-gold"
+                    : "text-onyx/50 hover:text-onyx"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            <span className="ml-auto text-[11px] tracking-[0.15em] uppercase text-onyx/50 pb-3.5">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "piece" : "pieces"}
+            </span>
+          </motion.div>
+        )}
       </section>
 
       {/* Search + sort bar */}
@@ -343,398 +281,75 @@ export default function Shop() {
             </button>
           </div>
 
-          <div className="flex md:flex-row flex-col gap-3 md:gap-4 md:items-center md:justify-end shrink-0">
-            {/* Desktop filters button (opens horizontal filters) */}
-            <button
-              type="button"
-              onClick={() => setFilterDrawerOpen((v) => !v)}
-              className={`hidden md:inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase px-5 py-3 border transition-colors whitespace-nowrap ${
-                filterDrawerOpen ? "bg-onyx text-ivory border-onyx" : "border-onyx text-onyx hover:bg-onyx hover:text-ivory"
-              }`}
+          <div className="relative w-full md:w-auto">
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-onyx/50 pointer-events-none" />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              aria-label="Sort products"
+              className="appearance-none bg-mist pl-4 pr-10 py-3 text-[11px] tracking-[0.15em] uppercase focus:outline-none focus:ring-1 focus:ring-gold w-full md:w-auto min-w-0"
             >
-              <SlidersHorizontal size={14} />
-              Filters
-              {activeFilterCount > 0 && (
-                <span className="bg-gold text-onyx text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-
-            <div className="flex md:flex-row items-center gap-3 md:gap-4 w-full md:w-auto">
-              {/* Mobile filters button */}
-              <button
-                type="button"
-                onClick={() => setFilterDrawerOpen(true)}
-                className="md:hidden inline-flex items-center justify-center gap-2 text-[11px] tracking-[0.2em] uppercase px-4 py-3 border border-onyx text-onyx whitespace-nowrap flex-1"
-              >
-                <SlidersHorizontal size={14} />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="bg-gold text-onyx text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
-
-              <div className="relative md:ml-0 flex-1 md:flex-none">
-                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-onyx/50 pointer-events-none" />
-                <select
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
-                  aria-label="Sort products"
-                  className="appearance-none bg-mist pl-4 pr-10 py-3 text-[11px] tracking-[0.15em] uppercase focus:outline-none focus:ring-1 focus:ring-gold w-full md:w-auto min-w-0"
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Active filters chips */}
-        {activeFilterCount > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {gender && (
-              <FilterChip
-                label={gender === "men" ? "Men" : gender === "ladies" ? "Ladies" : "All Genders"}
-                onRemove={removeGenderFilter}
-              />
-            )}
-            {category && (
-              <FilterChip label={categories.find((c) => c.slug === category)?.name || category} onRemove={() => setCategory("")} />
-            )}
-            {brand && <FilterChip label={brand} onRemove={() => setBrand("")} />}
-            {color && <FilterChip label={color} onRemove={() => setColor("")} />}
-            {availability && <FilterChip label={availability === "in-stock" ? "In Stock" : "Sold Out"} onRemove={() => setAvailability("")} />}
-            {(priceRange.min > 0 || priceRange.max < Infinity) && (
-              <FilterChip label={priceRange.label} onRemove={() => setPriceRange(PRICE_OPTIONS[0])} />
-            )}
-            <button
-              type="button"
-              onClick={clearAllFilters}
-              className="text-[10px] tracking-[0.2em] uppercase text-onyx/60 underline underline-offset-4 hover:text-gold-dark"
-            >
-              Clear All
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pb-20">
-        <div className="flex gap-10">
-          {/* ------------------------------------------------------------------
-              DESKTOP HORIZONTAL FILTERS
-          ------------------------------------------------------------------ */}
-          <AnimatePresence>
-            {filterDrawerOpen && (
-              <motion.aside
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="hidden md:block w-64 shrink-0 overflow-hidden"
-              >
-                <div className="border border-mist p-6 space-y-7">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] tracking-[0.3em] uppercase text-onyx">
-                      Filters
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={clearAllFilters}
-                      className="text-[10px] tracking-[0.2em] uppercase text-onyx/60 hover:text-gold-dark"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                  <FilterContent
-                    categories={categories}
-                    category={category}
-                    setCategory={setCategory}
-                    brand={brand}
-                    setBrand={setBrand}
-                    color={color}
-                    setColor={setColor}
-                    priceRange={priceRange}
-                    setPriceRange={setPriceRange}
-                    availability={availability}
-                    setAvailability={setAvailability}
-                  />
-                </div>
-              </motion.aside>
-            )}
-          </AnimatePresence>
-
-          {/* ------------------------------------------------------------------
-              PRODUCT GRID (2 cols mobile/tablet, 4 cols desktop)
-          ------------------------------------------------------------------ */}
-          <div className="flex-1">
-            {loading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="bg-mist aspect-[3/4] animate-pulse" />
-                ))}
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="text-center py-24">
-                <p className="font-display text-2xl mb-3">No Products Found</p>
-                <p className="text-onyx/60 text-sm mb-6">
-                  Try adjusting your filters or search terms.
-                </p>
-                <button type="button" onClick={clearAllFilters} className="btn-luxury-outline">
-                  Clear All Filters
-                </button>
-              </div>
-            ) : (
-              <>
-                <p className="text-[11px] tracking-[0.15em] uppercase text-onyx/50 mb-6">
-                  {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
-                </p>
-                <motion.div
-                  layout
-                  className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
-                >
-                  <AnimatePresence mode="popLayout">
-                    {filteredProducts.map((product, index) => (
-                      <motion.div
-                        key={product._id}
-                        layout
-                        initial={{ opacity: 0, y: 24 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.96 }}
-                        transition={{
-                          duration: 0.5,
-                          delay: (index % 6) * 0.06,
-                          ease: "easeOut",
-                        }}
-                      >
-                        <ProductCard product={product} index={index % 4} />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              </>
-            )}
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
 
       {/* ------------------------------------------------------------------
-          MOBILE FILTER DRAWER
+          PRODUCT GRID (2 cols mobile/tablet, 4 cols desktop)
       ------------------------------------------------------------------ */}
-      <AnimatePresence>
-        {filterDrawerOpen && (
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pb-20">
+        {loading ? (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-mist aspect-[3/4] animate-pulse" />
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="font-display text-2xl mb-3">No Products Found</p>
+            <p className="text-onyx/60 text-sm mb-6">
+              Try adjusting your search terms.
+            </p>
+            <button type="button" onClick={clearAllFilters} className="btn-luxury-outline">
+              Clear Search
+            </button>
+          </div>
+        ) : (
           <>
+            <p className="text-[11px] tracking-[0.15em] uppercase text-onyx/50 mb-6">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
+            </p>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setFilterDrawerOpen(false)}
-              className="fixed inset-0 z-50 bg-onyx/60 md:hidden"
-            />
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 left-0 bottom-0 z-50 w-[320px] max-w-[85vw] bg-ivory shadow-2xl overflow-y-auto md:hidden"
+              layout
+              className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
             >
-              <div className="flex items-center justify-between px-5 h-16 border-b border-mist sticky top-0 bg-ivory">
-                <h3 className="text-[12px] tracking-[0.3em] uppercase text-onyx">
-                  Filters
-                </h3>
-                <button
-                  type="button"
-                  aria-label="Close filters"
-                  onClick={() => setFilterDrawerOpen(false)}
-                  className="p-2 text-onyx"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="px-5 py-6 space-y-7">
-                <FilterContent
-                  categories={categories}
-                  category={category}
-                  setCategory={setCategory}
-                  brand={brand}
-                  setBrand={setBrand}
-                  color={color}
-                  setColor={setColor}
-                  priceRange={priceRange}
-                  setPriceRange={setPriceRange}
-                  availability={availability}
-                  setAvailability={setAvailability}
-                />
-              </div>
-              <div className="px-5 pb-6 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearAllFilters();
-                    setFilterDrawerOpen(false);
-                  }}
-                  className="flex-1 btn-luxury-outline"
-                >
-                  Clear All
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFilterDrawerOpen(false)}
-                  className="flex-1 btn-gold"
-                >
-                  View Results
-                </button>
-              </div>
-            </motion.aside>
+              <AnimatePresence mode="popLayout">
+                {filteredProducts.map((product, index) => (
+                  <motion.div
+                    key={product._id}
+                    layout
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: (index % 6) * 0.06,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <ProductCard product={product} index={index % 4} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </div>
     </>
-  );
-}
-
-// ------------------------------------------------------------------
-// Filter content (shared between desktop filters and mobile drawer)
-// ------------------------------------------------------------------
-function FilterContent({
-  categories,
-  category,
-  setCategory,
-  brand,
-  setBrand,
-  color,
-  setColor,
-  priceRange,
-  setPriceRange,
-  availability,
-  setAvailability,
-}) {
-  return (
-    <>
-      {/* Category */}
-      <FilterGroup title="Category">
-        {categories.map((cat) => (
-          <label key={cat._id} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="radio"
-              name="filter-category"
-              checked={category === cat.slug}
-              onChange={() => setCategory(category === cat.slug ? "" : cat.slug)}
-              className="accent-[#d4af37] w-4 h-4"
-            />
-            <span className="text-sm text-onyx/80">{cat.name}</span>
-          </label>
-        ))}
-      </FilterGroup>
-
-      {/* Brand */}
-      <FilterGroup title="Brand">
-        {["Zealc.ollection Signature", "Zealc.ollection Atelier", "Maison Zealc.ollection"].map((b) => (
-          <label key={b} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="radio"
-              name="filter-brand"
-              checked={brand === b}
-              onChange={() => setBrand(brand === b ? "" : b)}
-              className="accent-[#d4af37] w-4 h-4"
-            />
-            <span className="text-sm text-onyx/80">{b}</span>
-          </label>
-        ))}
-      </FilterGroup>
-
-      {/* Color */}
-      <FilterGroup title="Color">
-        <div className="flex flex-wrap gap-2">
-          {COLOR_OPTIONS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setColor(color === c ? "" : c)}
-              className={`px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase border transition-colors ${
-                color === c
-                  ? "bg-onyx text-ivory border-onyx"
-                  : "border-onyx/20 text-onyx/70 hover:border-onyx"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      {/* Price */}
-      <FilterGroup title="Price">
-        {PRICE_OPTIONS.map((range) => (
-          <label key={range.label} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="radio"
-              name="filter-price"
-              checked={priceRange.label === range.label}
-              onChange={() => setPriceRange(range)}
-              className="accent-[#d4af37] w-4 h-4"
-            />
-            <span className="text-sm text-onyx/80">{range.label}</span>
-          </label>
-        ))}
-      </FilterGroup>
-
-      {/* Availability */}
-      <FilterGroup title="Availability">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="radio"
-            name="filter-availability"
-            checked={availability === "in-stock"}
-            onChange={() => setAvailability(availability === "in-stock" ? "" : "in-stock")}
-            className="accent-[#d4af37] w-4 h-4"
-          />
-          <span className="text-sm text-onyx/80">In Stock</span>
-        </label>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="radio"
-            name="filter-availability"
-            checked={availability === "sold-out"}
-            onChange={() => setAvailability(availability === "sold-out" ? "" : "sold-out")}
-            className="accent-[#d4af37] w-4 h-4"
-          />
-          <span className="text-sm text-onyx/80">Sold Out</span>
-        </label>
-      </FilterGroup>
-    </>
-  );
-}
-
-function FilterGroup({ title, children }) {
-  return (
-    <div>
-      <h4 className="text-[10px] tracking-[0.3em] uppercase text-onyx/50 mb-3">
-        {title}
-      </h4>
-      <div className="space-y-2.5">{children}</div>
-    </div>
-  );
-}
-
-function FilterChip({ label, onRemove }) {
-  return (
-    <span className="inline-flex items-center gap-2 bg-mist px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase text-onyx">
-      {label}
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={`Remove ${label} filter`}
-        className="text-onyx/50 hover:text-gold-dark"
-      >
-        <X size={12} />
-      </button>
-    </span>
   );
 }
