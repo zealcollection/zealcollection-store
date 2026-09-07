@@ -168,11 +168,10 @@
   }
 
   .editorial-hero__media,
-  .article-hero__media,
-  .blog-topic-image {
-    object-fit: contain;
-    background-color: #0f0f0f;
-  }
+  .article-hero__media {
+  object-fit: cover;
+  object-position: center 35%;
+}
 
   .editorial-hero {
     min-height: 64svh;

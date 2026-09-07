@@ -211,7 +211,7 @@ export default function Shop() {
           HERO - dark, cinematic, mirrors the Men / Ladies / Unisex edits.
           Paste your Cloudinary URL into HERO_IMAGE_URL above.
       ------------------------------------------------------------------ */}
-      <section className="relative bg-onyx overflow-hidden min-h-[calc(100vh-56px)] md:min-h-[calc(100vh+80px)]">
+      <section className="homepage-hero relative bg-onyx overflow-hidden min-h-[calc(100vh-56px)] md:min-h-[calc(100vh+80px)]">
         {/* Placeholder so the hero keeps its cinematic height until an image is pasted */}
         {!HERO_IMAGE_URL && !HERO_VIDEO_URL && (
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(224,182,71,0.07),rgba(15,15,15,0.98)_75%)]" aria-hidden="true" />
