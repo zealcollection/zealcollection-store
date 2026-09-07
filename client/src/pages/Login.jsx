@@ -71,17 +71,21 @@ export default function Login() {
   }, [login, navigate, from]);
 
   const onSubmit = async (values) => {
-    try {
-      setSubmitting(true);
-      await login(values.email, values.password);
-      toast.success("Welcome back");
+  try {
+    setSubmitting(true);
+    const user = await login(values.email, values.password);
+    toast.success("Welcome back");
+    if (user?.role === "admin") {
+      navigate("/admin", { replace: true });
+    } else {
       navigate(from, { replace: true });
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSubmitting(false);
     }
-  };
+  } catch (err) {
+    toast.error(err.message);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (isAuthenticated) {
     navigate("/account", { replace: true });
@@ -180,13 +184,6 @@ export default function Login() {
               {submitting ? "Signing In..." : "Sign In"}
             </button>
           </form>
-
-          <p className="text-center text-sm text-onyx/60 mt-8">
-            New to Zealc.ollection?{" "}
-            <Link to="/register" className="text-gold-dark underline underline-offset-4 hover:text-gold">
-              Create an Account
-            </Link>
-          </p>
         </motion.div>
       </div>
     </>
