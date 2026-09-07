@@ -269,6 +269,7 @@ export default function Blog() {
             alt=""
             aria-hidden="true"
             className="editorial-hero__media absolute inset-0 w-full h-full object-cover object-top"
+            style={{ objectFit: "cover" }}
           />
         )}
         {BLOG_HERO_VIDEO_URL && (
@@ -280,6 +281,7 @@ export default function Blog() {
             playsInline
             aria-hidden="true"
             className="editorial-hero__media absolute inset-0 w-full h-full object-cover"
+            style={{ objectFit: "cover" }}
           />
         )}
         {/* Dark scrim so text stays crisp over any media */}
@@ -471,6 +473,7 @@ function ArticleView({ post, blocks, related }) {
             src={post.heroImage || post.image}
             alt={post.title}
             className="article-hero__media absolute inset-0 w-full h-full object-cover"
+            style={{ objectFit: "cover" }}
           />
         ) : (
           // Editorial backdrop before the hero image is uploaded.
