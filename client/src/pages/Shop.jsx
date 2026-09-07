@@ -278,9 +278,17 @@ export default function Shop() {
               type="button"
               onClick={() => {
                 setCategory(tab.value);
+                // These top-level tabs are a general "shop by category"
+                // control, not a gender-scoped one - so using them should
+                // drop any leftover gender restriction from arriving here
+                // via the Men's/Ladies' edit ("Shop the edit"). Otherwise
+                // a category tab can silently combine with that hidden
+                // gender filter and return "No Products Found".
+                setGender("");
                 const params = new URLSearchParams(searchParams);
                 if (tab.value) params.set("category", tab.value);
                 else params.delete("category");
+                params.delete("gender");
                 setSearchParams(params);
               }}
               className={`text-[11px] tracking-[0.2em] uppercase pb-3.5 transition-colors duration-300 ${
