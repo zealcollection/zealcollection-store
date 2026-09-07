@@ -47,9 +47,20 @@ export default function Shop() {
     let cancelled = false;
     async function loadData() {
       try {
+        // IMPORTANT: always fetch the FULL catalog here, never scoped by
+        // gender. This used to call productsAPI.getAll({ gender: ... })
+        // whenever the page was first opened with a ?gender= param (e.g.
+        // arriving from the Men's/Ladies' edit's "Shop the edit" button).
+        // That baked the gender restriction into `allProducts` itself, at
+        // the SERVER level, for the entire lifetime of this page visit -
+        // so even after clearing the gender filter client-side (e.g. by
+        // clicking a category tab), the other gender's products were
+        // never actually fetched and "No Products Found" would appear.
+        // Fetching everything once and filtering by gender purely
+        // client-side (see `filteredProducts` below) fixes this for good.
         const [catRes, prodRes] = await Promise.all([
           categoriesAPI.getAll(),
-          productsAPI.getAll(searchParams.get("gender") ? { gender: searchParams.get("gender") } : undefined),
+          productsAPI.getAll(),
         ]);
         if (!cancelled) {
           if (catRes.data.categories.length > 0) setCategories(catRes.data.categories);
