@@ -365,7 +365,12 @@ function truncateDescription(desc = "") {
 }
 
 export default function Home() {
-  const [categories, setCategories] = useState(DEMO_CATEGORIES);
+  // NOTE: categories now starts EMPTY (not DEMO_CATEGORIES) so the old
+  // demo Watches/Handbags/Nightwear cards never flash on screen before
+  // the real categories arrive from the API. See the "Collection" section
+  // in HeroSections below, which now waits for `loading` to finish (or
+  // for real categories to arrive) before rendering anything.
+  const [categories, setCategories] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [testimonials, setTestimonials] = useState(DEMO_TESTIMONIALS);
@@ -449,6 +454,11 @@ export default function Home() {
   const newArrivalsList =
     newArrivals.length > 0 ? newArrivals : DEMO_PRODUCTS.slice(4, 8);
 
+  // Categories to render: real ones once fetched, otherwise fall back to
+  // the demo set ONLY after loading has finished (e.g. API failed). This
+  // keeps the demo cards from ever flashing before the real fetch resolves.
+  const categoriesList = categories.length > 0 ? categories : loading ? [] : DEMO_CATEGORIES;
+
   // Slideshow images: split the comma-separated list and trim whitespace.
   const slideshowImages = (HERO_SLIDESHOW_IMAGES || "")
     .split(",")
@@ -494,7 +504,8 @@ export default function Home() {
 
       {/* All remaining homepage sections render inside the fragment here */}
       <HeroSections
-        categories={categories}
+        categories={categoriesList}
+        categoriesLoading={loading && categories.length === 0}
         bestSellersList={bestSellersList}
         newArrivalsList={newArrivalsList}
         loading={loading}
@@ -666,7 +677,7 @@ function HeroDeck({ slideIndex, setSlideIndex, marqueeWords, slideshowImages, he
 // HERO SECTIONS - every homepage section after the hero, extracted so
 // the fragment structure stays clean (HeroDeck stays a single element).
 // ------------------------------------------------------------------
-function HeroSections({ categories, bestSellersList, newArrivalsList, loading, testimonials, instagramImages, instagramHandle, collectionImage, bestSellersImages }) {
+function HeroSections({ categories, categoriesLoading, bestSellersList, newArrivalsList, loading, testimonials, instagramImages, instagramHandle, collectionImage, bestSellersImages }) {
   return (
     <>
 
@@ -700,17 +711,28 @@ function HeroSections({ categories, bestSellersList, newArrivalsList, loading, t
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
-          {categories.map((category, index) => {
-            const meta = categoryMeta[category.slug] || {
-              number: String(index + 1).padStart(2, "0"),
-              label: category.name.toUpperCase(),
-              title: category.name,
-              tagline: "Discover the collection.",
-            };
-            return <CategorySlideCard key={category._id || category.slug} category={category} meta={meta} index={index} />;
-          })}
-        </div>
+        {categoriesLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="h-[380px] sm:h-[480px] lg:h-[560px] bg-sand animate-pulse"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+            {categories.map((category, index) => {
+              const meta = categoryMeta[category.slug] || {
+                number: String(index + 1).padStart(2, "0"),
+                label: category.name.toUpperCase(),
+                title: category.name,
+                tagline: "Discover the collection.",
+              };
+              return <CategorySlideCard key={category._id || category.slug} category={category} meta={meta} index={index} />;
+            })}
+          </div>
+        )}
       </section>
 
       {/* ------------------------------------------------------------------
