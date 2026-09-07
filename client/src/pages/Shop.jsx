@@ -183,8 +183,16 @@ export default function Shop() {
     return result;
   }, [allProducts, search, category, gender, brand, color, priceRange, availability, sort]);
 
+  // NOTE: `gender` is now included here. Arriving on /shop from the Men's
+  // or Ladies' edit ("Shop the edit") applies a gender filter that used to
+  // be completely invisible - it wasn't counted as an active filter and
+  // had no chip to remove it, so browsing other categories could silently
+  // return "No Products Found" with no way to tell why. Counting it here
+  // makes the active-filters row (and its "Clear All") appear whenever a
+  // gender restriction is in effect, on both mobile and desktop.
   const activeFilterCount = [
     category,
+    gender,
     brand,
     color,
     availability,
@@ -201,6 +209,15 @@ export default function Shop() {
     setSort("");
     setSearch("");
     setSearchParams({});
+  };
+
+  // Removes just the gender restriction (e.g. leftover from visiting the
+  // Men's/Ladies' edit) while keeping any other active filters intact.
+  const removeGenderFilter = () => {
+    setGender("");
+    const params = new URLSearchParams(searchParams);
+    params.delete("gender");
+    setSearchParams(params);
   };
 
   return (
@@ -374,6 +391,12 @@ export default function Shop() {
         {/* Active filters chips */}
         {activeFilterCount > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">
+            {gender && (
+              <FilterChip
+                label={gender === "men" ? "Men" : gender === "ladies" ? "Ladies" : "All Genders"}
+                onRemove={removeGenderFilter}
+              />
+            )}
             {category && (
               <FilterChip label={categories.find((c) => c.slug === category)?.name || category} onRemove={() => setCategory("")} />
             )}
