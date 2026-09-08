@@ -958,7 +958,7 @@ function HeroSections({ categories, categoriesLoading, bestSellersList, newArriv
       <section className="py-24 md:py-32 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
         <AnimatedSection className="text-center mb-14">
           <p className="eyebrow mb-4">Follow the journey</p>
-          <h2 className="section-heading text-3xl md:text-5xl">@{instagramHandle || "zealcollection"}</h2>
+          <h2 className="section-heading text-3xl md:text-5xl">@{instagramHandle || "Zealc.ollection"}</h2>
         </AnimatedSection>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
