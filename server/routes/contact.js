@@ -38,7 +38,32 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    // Hard caps so a slow/blocked SMTP connection can never hang a
+    // request indefinitely - without these, nodemailer has no
+    // default timeout on some hosts.
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 8000,
   });
+}
+
+function notifyByEmail({ name, email, subject, message }) {
+  if (!transporter) return;
+  // Deliberately not awaited by the caller - the DB write already
+  // succeeded, so a slow or failing email must not delay or fail
+  // the response the user is waiting on.
+  transporter
+    .sendMail({
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+      to: process.env.SMTP_USER,
+      replyTo: email,
+      subject: `New contact form message: ${subject}`,
+      text: `From: ${name} <${email}>\n\n${message}`,
+      html: `<p><strong>From:</strong> ${name} (${email})</p><p>${message}</p>`,
+    })
+    .catch((mailError) => {
+      console.error("Contact email notification failed:", mailError.message);
+    });
 }
 
 // POST /api/contact
@@ -52,22 +77,8 @@ router.post("/", async (req, res) => {
 
     const contact = await Contact.create({ name, email, subject, message });
 
-    if (transporter) {
-      try {
-        await transporter.sendMail({
-          from: process.env.EMAIL_FROM || process.env.SMTP_USER,
-          to: process.env.SMTP_USER,
-          replyTo: email,
-          subject: `New contact form message: ${subject}`,
-          text: `From: ${name} <${email}>\n\n${message}`,
-          html: `<p><strong>From:</strong> ${name} (${email})</p><p>${message}</p>`,
-        });
-      } catch (mailError) {
-        // The message is already saved, so a failed notification
-        // email shouldn't turn into a failed request for the user.
-        console.error("Contact email notification failed:", mailError.message);
-      }
-    }
+    // Fire-and-forget: response goes out as soon as the message is saved.
+    notifyByEmail({ name, email, subject, message });
 
     return res.status(201).json({
       message: "Your message has been received",
