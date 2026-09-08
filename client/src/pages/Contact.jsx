@@ -55,8 +55,8 @@ export default function Contact() {
 
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-[120px] md:pt-[210px] pb-12 md:pb-16">
         <div className="text-center mb-14">
-          <h1 className="section-heading text-3xl md:text-5xl">Contact Us</h1>
-          <p className="text-onyx/60 max-w-xl mx-auto mt-4 font-body">
+          <h1 className="section-heading text-3xl md:text-5xl mb-5">Contact Us</h1>
+          <p className="text-onyx/60 max-w-xl mx-auto font-body">
             Our team is available to assist with product enquiries,
             order support and appointments.
           </p>
