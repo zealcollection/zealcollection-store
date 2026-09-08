@@ -70,6 +70,23 @@ export default function Login() {
     }
   }, [login, navigate, from]);
 
+  // Guard for someone landing directly on /login while already
+  // authenticated (e.g. a saved bookmark, browser back button). This must
+  // only run ONCE ON MOUNT - not on every render - because it used to live
+  // directly in the render body and re-fire every time `isAuthenticated`
+  // changed. Since a fresh login also flips `isAuthenticated` to true
+  // while this component is still mounted, that render-body check was
+  // racing with (and overwriting) the role-based navigate() in onSubmit
+  // below - silently bouncing freshly-logged-in admins to /account instead
+  // of /admin. Running this only at mount time means it can never conflict
+  // with the login form's own redirect again.
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/account", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onSubmit = async (values) => {
   try {
     setSubmitting(true);
@@ -86,11 +103,6 @@ export default function Login() {
     setSubmitting(false);
   }
 };
-
-  if (isAuthenticated) {
-    navigate("/account", { replace: true });
-    return null;
-  }
 
   return (
     <>
