@@ -173,7 +173,7 @@ export default function About() {
               {cms.aboutStoryTitle ? (
                 cms.aboutStoryTitle
               ) : (
-                <>Crafted in Silence, <em className="text-gold-dark">Worn with Pride</em></>
+                <>Chosen with Care, <em className="text-gold-dark">Worn with Confidence</em></>
               )}
             </h2>
             <p className="text-onyx/70 leading-relaxed mb-5 font-body">

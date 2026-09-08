@@ -24,7 +24,7 @@ const FAQ_ITEMS = [
   {
     question: "What is your return policy?",
     answer:
-      "You may return any unworn item in its original condition and packaging within **14 days of delivery** for a **90% refund of the purchase price**. Items must be returned with all original packaging, tags, and accessories. Please visit our Shipping and Returns page for full details.",
+      "You may return any unworn item in its original condition and packaging within 14 days of delivery for a 90% refund of the purchase price. Items must be returned with all original packaging, tags, and accessories.",
   },
   {
     question: "Are your products authentic?",
