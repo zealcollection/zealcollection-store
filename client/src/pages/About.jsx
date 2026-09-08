@@ -16,32 +16,37 @@ const ABOUT_FAQ_ITEMS = [
   {
     question: "How do I place an order?",
     answer:
-      "Browse our collection, select your desired size and color, then click Add to Cart. When you are ready, proceed to Checkout, enter your shipping details and choose your preferred payment method (Paystack, Stripe or Cash on Delivery). You will receive an email confirmation once your order is placed.",
+      "Browse our collection and select your desired item. Click Add to Cart and proceed to Checkout when you are ready. Enter your shipping details and complete your payment via M-Pesa Send Money. You will receive an order confirmation once your order is placed.",
   },
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept all major credit and debit cards through Paystack and Stripe, including Visa, Mastercard and American Express. Bank transfers, mobile money and Cash on Delivery are also available in selected regions.",
+      "We accept payments via M-Pesa Send Money. Simple, secure, and convenient.",
   },
   {
-    question: "Do you offer complimentary shipping?",
+    question: "How does shipping work?",
     answer:
-      "Yes. All orders above 500 qualify for complimentary insured shipping worldwide. Orders below this threshold are shipped for a flat rate of 25. Express delivery (1-2 business days) is available for 45.",
+      "We deliver watches and handbags to customers across Kenya. Shipping fees apply to all orders and may vary depending on your location and delivery option. Once your order is confirmed, you'll receive the relevant delivery details.",
   },
   {
     question: "What is your return policy?",
     answer:
-      "You may return any unworn item in its original condition and packaging within 30 days of delivery for a full refund. Timepieces must be returned with their certificates of authenticity. Please visit our Shipping and Returns page for full details.",
-  },
-  {
-    question: "Do your watches come with a warranty?",
-    answer:
-      "Yes. All timepieces carry a two-year international warranty covering manufacturing defects. Leather goods are covered for one year. Please contact our concierge team with your order reference for any warranty claim.",
+      "You may return any unworn item in its original condition and packaging within 14 days of delivery for a 90% refund of the purchase price. Items must be returned with all original packaging, tags, and accessories.",
   },
   {
     question: "How can I track my order?",
     answer:
-      "Once your order ships, you will receive a tracking number by email. You can also view the status of all your orders in the Orders section of your account dashboard.",
+      "Once your order ships, you will receive a tracking number by email.",
+  },
+  {
+    question: "Do you offer gift packaging?",
+    answer:
+      "Every order is packaged at no additional cost.",
+  },
+  {
+    question: "How do I contact customer service?",
+    answer:
+      "Our customer service team is available via email at zealc.ollection28@gmail.com. You may also use the contact form on our Contact page.",
   },
 ];
 
