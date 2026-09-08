@@ -308,6 +308,13 @@ export function AppProvider({ children }) {
     return data.user;
   };
 
+  const loginWithToken = (token, user) => {
+    if (!token || !user) throw new Error("Invalid authentication response");
+    localStorage.setItem("token", token);
+    dispatchAuth({ type: "LOGIN", payload: { user, token } });
+    return user;
+  };
+
   const register = async (payload) => {
     const { data } = await authAPI.register(payload);
     localStorage.setItem("token", data.token);
@@ -336,6 +343,7 @@ export function AppProvider({ children }) {
     isAuthenticated,
     isAdmin,
     login,
+    loginWithToken,
     register,
     logout,
     updateProfile,

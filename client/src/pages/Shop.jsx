@@ -63,8 +63,10 @@ export default function Shop() {
           productsAPI.getAll(),
         ]);
         if (!cancelled) {
-          if (catRes.data.categories.length > 0) setCategories(catRes.data.categories);
-          if (prodRes.data.products.length > 0) setAllProducts(prodRes.data.products);
+          const apiCategories = Array.isArray(catRes.data?.categories) ? catRes.data.categories : [];
+          const apiProducts = Array.isArray(prodRes.data?.products) ? prodRes.data.products : [];
+          if (apiCategories.length > 0) setCategories(apiCategories);
+          if (apiProducts.length > 0) setAllProducts(apiProducts);
         }
       } catch {
         // Fall back to demo data

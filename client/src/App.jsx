@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { useEffect, useState } from "react";
 
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -29,45 +28,6 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import ShippingReturns from "./pages/ShippingReturns";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-
-function AdminOnly({ children }) {
-  const { auth } = useApp();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // auth.loading is the real flag (set in AppContext's authReducer,
-    // starts true, flips false once authAPI.me() resolves or fails).
-    // This used to destructure a nonexistent `loadingAuth` from useApp(),
-    // which is always undefined - so `ready` was being set to true on the
-    // very first render, before the app had actually confirmed who (if
-    // anyone) is logged in. That could deny a real admin access if this
-    // component rendered before auth.user was populated.
-    if (!auth.loading) {
-      setReady(true);
-    }
-  }, [auth.loading]);
-
-  if (!ready) {
-    return null;
-  }
-  if (auth.user?.role !== "admin") {
-    return (
-      <div className="max-w-[1440px] mx-auto px-4 py-24 text-center">
-        <h1 className="section-heading text-2xl mb-4">Access Denied</h1>
-        <p className="text-onyx/60 text-sm">
-          You must be signed in as an administrator to view this page.
-        </p>
-        <Link
-          to="/login"
-          className="btn-gold inline-block mt-8"
-        >
-          Sign in with your admin account
-        </Link>
-      </div>
-    );
-  }
-  return children;
-}
 
 const router = createBrowserRouter([
   {
@@ -283,10 +243,8 @@ const router = createBrowserRouter([
     path: "/admin",
     element: (
       <Layout>
-        <ProtectedRoute>
-          <AdminOnly>
-            <AdminDashboard />
-          </AdminOnly>
+        <ProtectedRoute adminOnly>
+          <AdminDashboard />
         </ProtectedRoute>
       </Layout>
     ),

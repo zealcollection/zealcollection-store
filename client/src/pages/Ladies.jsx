@@ -74,7 +74,8 @@ export default function Ladies() {
             (c) => !c.gender || c.gender === "ladies" || c.gender === "unisex"
           );
           if (sectionCats.length > 0) setCategories(sectionCats);
-          if (prodRes.data.products.length > 0) setAllProducts(prodRes.data.products);
+          const apiProducts = Array.isArray(prodRes.data?.products) ? prodRes.data.products : [];
+          if (apiProducts.length > 0) setAllProducts(apiProducts);
         }
       } catch {
         // Fall back to demo data

@@ -487,8 +487,8 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
   const [colorUploading, setColorUploading] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   // ------------------------------------------------------------------
-  // LOCAL IMAGE UPLOAD (no Cloudinary needed): pick files from the
-  // computer, they upload to the server and their URL paths are added
+  // DEVICE IMAGE UPLOAD: pick files from any device; the authenticated
+  // server sends them to Cloudinary and adds the returned permanent URLs
   // to the images list below.
   // ------------------------------------------------------------------
   const [uploading, setUploading] = useState(false);
@@ -776,8 +776,8 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
         </Field>
         <Field label={`Images (pick files from your computer, or paste one URL per line below)`}>
           {/* ------------------------------------------------------------------
-              LOCAL UPLOAD PICKER: the files chosen here are sent to the server
-              and appear as URL paths. Maximum 100 files, 8 MB each.
+              DEVICE UPLOAD PICKER: the files chosen here are sent through the
+              authenticated server to Cloudinary. Maximum 100 files, 8 MB each.
           ------------------------------------------------------------------ */}
           <div className="space-y-3">
             <label

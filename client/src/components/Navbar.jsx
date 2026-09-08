@@ -13,6 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
+import { categoriesAPI } from "../lib/api";
 
 // ------------------------------------------------------------------
 // Brand logo asset.
@@ -71,10 +72,8 @@ export default function Navbar() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/categories`);
-        if (!res.ok) throw new Error("Failed to fetch categories");
-        const data = await res.json();
-        if (!cancelled) setNavCategories(data.categories || []);
+        const res = await categoriesAPI.getAll();
+        if (!cancelled) setNavCategories(Array.isArray(res.data?.categories) ? res.data.categories : []);
       } catch {
         // Keep static links as a safety net
       }

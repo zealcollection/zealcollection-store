@@ -432,9 +432,12 @@ export default function Home() {
           productsAPI.getNewArrivals(),
         ]);
         if (!cancelled) {
-          if (catRes.data.categories.length > 0) setCategories(catRes.data.categories);
-          if (bestRes.data.products.length > 0) setBestSellers(bestRes.data.products);
-          if (newRes.data.products.length > 0) setNewArrivals(newRes.data.products);
+          const apiCategories = Array.isArray(catRes.data?.categories) ? catRes.data.categories : [];
+          const apiBestSellers = Array.isArray(bestRes.data?.products) ? bestRes.data.products : [];
+          const apiNewArrivals = Array.isArray(newRes.data?.products) ? newRes.data.products : [];
+          if (apiCategories.length > 0) setCategories(apiCategories);
+          if (apiBestSellers.length > 0) setBestSellers(apiBestSellers);
+          if (apiNewArrivals.length > 0) setNewArrivals(apiNewArrivals);
         }
       } catch {
         // Fall back to demo data

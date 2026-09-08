@@ -25,7 +25,7 @@ const loginSchema = z.object({
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useApp();
+  const { login, loginWithToken, isAuthenticated, auth } = useApp();
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -41,58 +41,65 @@ export default function Login() {
 
   // Load the Google Sign In client library and render the button.
   useEffect(() => {
-    if (!window.google || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
+    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
       return;
     }
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: async (response) => {
-        try {
-          const { data } = await authAPI.googleLogin(response.credential);
-          login(data.token, data.user);
-          toast.success("Signed in with Google");
-          navigate(from, { replace: true });
-        } catch (err) {
-          toast.error(err.message || "Google sign-in failed");
-        }
-      },
-    });
-    const el = document.getElementById("google-signin-button");
-    if (el) {
-      window.google.accounts.id.renderButton(el, {
-        type: "standard",
-        theme: "outline",
-        size: "large",
-        width: 360,
-        text: "signin_with",
-        shape: "rectangular",
+    let cancelled = false;
+    let retryTimer;
+    const renderGoogleButton = () => {
+      if (cancelled || !window.google?.accounts?.id) return false;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: async (response) => {
+          try {
+            const { data } = await authAPI.googleLogin(response.credential);
+            loginWithToken(data.token, data.user);
+            toast.success("Signed in with Google");
+            navigate(data.user?.role === "admin" ? "/admin" : from, { replace: true });
+          } catch (err) {
+            toast.error(err.message || "Google sign-in failed");
+          }
+        },
       });
+      const el = document.getElementById("google-signin-button");
+      if (el) {
+        window.google.accounts.id.renderButton(el, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          width: 360,
+          text: "signin_with",
+          shape: "rectangular",
+        });
+      }
+      return true;
+    };
+    if (!renderGoogleButton()) {
+      retryTimer = window.setInterval(() => {
+        if (renderGoogleButton()) window.clearInterval(retryTimer);
+      }, 100);
     }
-  }, [login, navigate, from]);
+    return () => {
+      cancelled = true;
+      window.clearInterval(retryTimer);
+    };
+  }, [loginWithToken, navigate, from]);
 
-  // Guard for someone landing directly on /login while already
-  // authenticated (e.g. a saved bookmark, browser back button). This must
-  // only run ONCE ON MOUNT - not on every render - because it used to live
-  // directly in the render body and re-fire every time `isAuthenticated`
-  // changed. Since a fresh login also flips `isAuthenticated` to true
-  // while this component is still mounted, that render-body check was
-  // racing with (and overwriting) the role-based navigate() in onSubmit
-  // below - silently bouncing freshly-logged-in admins to /account instead
-  // of /admin. Running this only at mount time means it can never conflict
-  // with the login form's own redirect again.
+  // Redirect after the confirmed user is available. This also handles the
+  // case where /auth/me restores the role just after the token is saved.
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/account", { replace: true });
+    if (isAuthenticated && auth.user) {
+      const isAdminUser = String(auth.user.role || "").toLowerCase() === "admin";
+      navigate(isAdminUser ? "/admin" : from, { replace: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthenticated, auth.user, navigate, from]);
 
   const onSubmit = async (values) => {
   try {
     setSubmitting(true);
     const user = await login(values.email, values.password);
     toast.success("Welcome back");
-    if (user?.role === "admin") {
+    if (String(user?.role || "").toLowerCase() === "admin") {
       navigate("/admin", { replace: true });
     } else {
       navigate(from, { replace: true });

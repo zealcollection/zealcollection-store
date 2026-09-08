@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { newsletterAPI } from "../lib/api";
+import { categoriesAPI, newsletterAPI } from "../lib/api";
 
 // ------------------------------------------------------------------
 // Footer logo asset + footer background image.
@@ -26,10 +26,8 @@ export default function Footer() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/categories`);
-        if (!res.ok) throw new Error("Failed to fetch categories");
-        const data = await res.json();
-        if (!cancelled) setFooterCategories(data.categories || []);
+        const res = await categoriesAPI.getAll();
+        if (!cancelled) setFooterCategories(Array.isArray(res.data?.categories) ? res.data.categories : []);
       } catch {
         // Leave footer links as-is if the API is unavailable
       }

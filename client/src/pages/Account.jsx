@@ -243,7 +243,7 @@ function OverviewTab({ user, setTab, orders }) {
         />
         <QuickCard
           title="Wishlist"
-          value={(JSON.parse(localStorage.getItem("wishlist") || "[]").length).toString()}
+          value={String(wishlistState?.items?.length || 0)}
           subtitle="saved items"
           onClick={() => setTab("wishlist")}
         />
