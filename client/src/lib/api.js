@@ -115,7 +115,12 @@ export const wishlistAPI = {
 export const newsletterAPI = {
   subscribe: (email) => api.post("/newsletter", { email }),
 };
-
+// ---------------------------------------------------------------
+// Contact API
+// ---------------------------------------------------------------
+export const contactAPI = {
+  send: (data) => api.post("/contact", data),
+};
 // ---------------------------------------------------------------
 // Admin API
 // ---------------------------------------------------------------

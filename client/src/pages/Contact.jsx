@@ -8,6 +8,7 @@ import { Mail, Phone, MapPin, Clock } from "lucide-react";
 
 import SEO from "../components/SEO";
 import AnimatedSection from "../components/AnimatedSection";
+import { contactAPI } from "../lib/api";
 
 // ------------------------------------------------------------------
 // CLOUDINARY: Upload to banners/contact-store.jpg and paste URL below.
@@ -37,15 +38,12 @@ export default function Contact() {
   const onSubmit = async (values) => {
     try {
       setSubmitting(true);
-      // ------------------------------------------------------------------
-      // NOTE: Wire this form to your backend or email service (Formspree,
-      // Resend, Nodemailer) when your backend is ready. For now it simulates
-      // a successful send after a brief delay.
-      // ------------------------------------------------------------------
-      await new Promise((resolve) => setTimeout(resolve, 900));
+      await contactAPI.send(values);
       setSent(true);
       toast.success("Your message has been received");
       reset();
+    } catch (error) {
+      toast.error(error.message || "Could not send your message");
     } finally {
       setSubmitting(false);
     }
@@ -57,11 +55,10 @@ export default function Contact() {
 
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-[120px] md:pt-[210px] pb-12 md:pb-16">
         <div className="text-center mb-14">
-          <p className="eyebrow mb-3">Concierge Service</p>
           <h1 className="section-heading text-3xl md:text-5xl">Contact Us</h1>
           <p className="text-onyx/60 max-w-xl mx-auto mt-4 font-body">
-            Our concierge team is available to assist with product enquiries,
-            order support and private appointments.
+            Our team is available to assist with product enquiries,
+            order support and appointments.
           </p>
         </div>
 
@@ -179,21 +176,21 @@ export default function Contact() {
                   <Mail size={18} className="text-gold mt-1 shrink-0" />
                   <div>
                     <p className="text-[10px] tracking-[0.25em] uppercase text-onyx/50 mb-1">Email</p>
-                    <p className="text-sm">concierge@zealcollection.com</p>
+                    <p className="text-sm">zealc.ollection28@gmail.com</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <Phone size={18} className="text-gold mt-1 shrink-0" />
                   <div>
                     <p className="text-[10px] tracking-[0.25em] uppercase text-onyx/50 mb-1">Phone</p>
-                    <p className="text-sm">+44 20 0000 0000</p>
+                    <p className="text-sm">+254 18 690768</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <MapPin size={18} className="text-gold mt-1 shrink-0" />
                   <div>
                     <p className="text-[10px] tracking-[0.25em] uppercase text-onyx/50 mb-1">Flagship Boutique</p>
-                    <p className="text-sm">12 Luxury Lane, London SW1A 1AA</p>
+                    <p className="text-sm">Nairobi, Kenya</p>
                   </div>
                 </div>
                 <div className="flex gap-4">

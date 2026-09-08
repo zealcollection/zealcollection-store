@@ -151,7 +151,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:hello@zealcollection.com"
+                  href="mailto:zealc.ollection28@gmail.com"
                   className={`text-sm ${body} hover:text-gold-dark transition-colors inline-flex items-center gap-1`}
                 >
                   Email <span aria-hidden className="text-xs">&#8599;</span>
@@ -187,25 +187,6 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
-
-            {/* Newsletter (compact) */}
-            <form onSubmit={handleSubmit} className={`flex gap-0 border-b ${border}`}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email address"
-                aria-label="Email address for newsletter"
-                className={`flex-1 bg-transparent px-0 py-2 text-sm ${body} placeholder:${faint} focus:outline-none`}
-              />
-              <button
-                type="submit"
-                disabled={submitting}
-                className={`text-[11px] tracking-[0.2em] uppercase ${faint} hover:text-gold-dark disabled:opacity-60 px-1`}
-              >
-                {submitting ? "..." : "Join"}
-              </button>
-            </form>
           </div>
         </div>
 
@@ -215,10 +196,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} {BRAND_NAME}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <span className={`${faint} text-[11px] tracking-wider`}>Visa</span>
-            <span className={`${faint} text-[11px] tracking-wider`}>Mastercard</span>
             <span className={`${faint} text-[11px] tracking-wider`}>Paystack</span>
-            <span className={`${faint} text-[11px] tracking-wider`}>Stripe</span>
           </div>
         </div>
       </div>

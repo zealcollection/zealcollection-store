@@ -1124,6 +1124,23 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
 // Orders tab
 // ------------------------------------------------------------------
 function OrdersTab({ orders, refresh, filters, setFilters }) {
+  const orderStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+  const paymentStatuses = ["pending", "paid", "failed", "refunded"];
+  const statusLabel = (value) => String(value || "pending").replace(/^./, (letter) => letter.toUpperCase());
+  const statusClass = (value, type) => {
+    if (type === "payment") {
+      return value === "paid"
+        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+        : value === "failed" || value === "refunded"
+        ? "bg-red-50 text-red-700 border-red-200"
+        : "bg-amber-50 text-amber-700 border-amber-200";
+    }
+    return value === "delivered"
+      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+      : value === "cancelled"
+      ? "bg-red-50 text-red-700 border-red-200"
+      : "bg-onyx/5 text-onyx/70 border-mist";
+  };
   const updateStatus = async (id, key, value) => {
     try {
       await adminAPI.updateOrder(id, { [key]: value });
@@ -1143,13 +1160,18 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <h2 className="font-display text-xl mr-auto">Orders ({filtered.length})</h2>
+        <div className="mr-auto">
+          <h2 className="font-display text-xl">Orders ({filtered.length})</h2>
+          <p className="text-[10px] tracking-[0.16em] uppercase text-onyx/45 mt-1">
+            Fulfillment and payment are tracked separately
+          </p>
+        </div>
         <select
           value={filters.status || ""}
           onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value || undefined }))}
           className="border border-mist px-3 py-2 text-xs focus:outline-none focus:border-gold"
         >
-          <option value="">All Statuses</option>
+          <option value="">All Order Statuses</option>
           {["pending", "processing", "shipped", "delivered", "cancelled"].map((s) => (
             <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
           ))}
@@ -1159,7 +1181,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
           onChange={(e) => setFilters((f) => ({ ...f, payment: e.target.value || undefined }))}
           className="border border-mist px-3 py-2 text-xs focus:outline-none focus:border-gold"
         >
-          <option value="">All Payments</option>
+          <option value="">All Payment Statuses</option>
           {["pending", "paid", "failed", "refunded"].map((s) => (
             <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
           ))}
@@ -1180,25 +1202,27 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                     {order.user?.name || "Guest"} - {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <select
-                    value={order.orderStatus || "pending"}
-                    onChange={(e) => updateStatus(order._id, "orderStatus", e.target.value)}
-                    className="border border-mist px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase focus:outline-none focus:border-gold"
-                  >
-                    {["pending", "processing", "shipped", "delivered", "cancelled"].map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={order.paymentStatus || "pending"}
-                    onChange={(e) => updateStatus(order._id, "paymentStatus", e.target.value)}
-                    className="border border-mist px-3 py-1.5 text-[10px] tracking-[0.15em] uppercase focus:outline-none focus:border-gold"
-                  >
-                    {["pending", "paid", "failed", "refunded"].map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                <div className="flex flex-wrap items-end gap-3">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[9px] tracking-[0.16em] uppercase text-onyx/45">Order status</span>
+                    <select
+                      value={order.orderStatus || "pending"}
+                      onChange={(e) => updateStatus(order._id, "orderStatus", e.target.value)}
+                      className={`border px-3 py-1.5 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.orderStatus, "order")}`}
+                    >
+                      {orderStatuses.map((s) => <option key={s} value={s}>{statusLabel(s)}</option>)}
+                    </select>
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[9px] tracking-[0.16em] uppercase text-onyx/45">Payment status</span>
+                    <select
+                      value={order.paymentStatus || "pending"}
+                      onChange={(e) => updateStatus(order._id, "paymentStatus", e.target.value)}
+                      className={`border px-3 py-1.5 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.paymentStatus, "payment")}`}
+                    >
+                      {paymentStatuses.map((s) => <option key={s} value={s}>{statusLabel(s)}</option>)}
+                    </select>
+                  </label>
                   <span className="font-display text-lg ml-2">{formatPrice(order.total)}</span>
                 </div>
               </div>
