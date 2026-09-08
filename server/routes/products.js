@@ -4,12 +4,12 @@ const Category = require("../models/Category");
 
 const router = express.Router();
 
-// Best sellers: highest rated / most sold, ordered by rating then sales
+// Best sellers: highest rated / most sold, ordered by rating then sold count
 router.get("/best-sellers", async (req, res) => {
   try {
     const products = await Product.find({ featured: true })
       .populate("category")
-      .sort({ rating: -1, sales: -1 })
+      .sort({ rating: -1, soldCount: -1 })
       .limit(12);
     res.json({ products });
   } catch (error) {
