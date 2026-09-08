@@ -189,7 +189,7 @@ export default function Contact() {
                 <div className="flex gap-4">
                   <MapPin size={18} className="text-gold mt-1 shrink-0" />
                   <div>
-                    <p className="text-[10px] tracking-[0.25em] uppercase text-onyx/50 mb-1">Flagship Boutique</p>
+                    <p className="text-[10px] tracking-[0.25em] uppercase text-onyx/50 mb-1">Zealcollection</p>
                     <p className="text-sm">Nairobi, Kenya</p>
                   </div>
                 </div>
