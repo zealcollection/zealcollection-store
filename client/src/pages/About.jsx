@@ -54,14 +54,14 @@ const ABOUT_FAQ_ITEMS = [
 // Use ABOUT_HERO_IMAGE_URL for a still image, or ABOUT_HERO_VIDEO_URL
 // for a looping muted video. Recommended size: 2560 x 1440 px landscape.
 // ------------------------------------------------------------------
-const ABOUT_HERO_IMAGE_URL = ""; // CLOUDINARY: banners/about-hero.jpg
+const ABOUT_HERO_IMAGE_URL = "https://res.cloudinary.com/z0afpk9x/image/upload/v1787785432/Heels_.png"; // CLOUDINARY: banners/about-hero.jpg
 const ABOUT_HERO_VIDEO_URL = ""; // CLOUDINARY (optional): banners/about-hero.mp4
-const ABOUT_CRAFT_IMAGE = ""; // CLOUDINARY: banners/about-craft.jpg
+const ABOUT_CRAFT_IMAGE = "https://res.cloudinary.com/z0afpk9x/image/upload/v1788888202/about_1.png"; // CLOUDINARY: banners/about-craft.jpg
 
 // ------------------------------------------------------------------
 // CLOUDINARY: Upload to banners/about-atelier.jpg and paste URL below.
 // ------------------------------------------------------------------
-const ABOUT_ATELIER_IMAGE = ""; // CLOUDINARY: banners/about-atelier.jpg
+const ABOUT_ATELIER_IMAGE = "https://res.cloudinary.com/z0afpk9x/image/upload/v1788888200/about_2.png"; // CLOUDINARY: banners/about-atelier.jpg
 
 export default function About() {
   // Admin CMS overrides: every text block below falls back to the copy

@@ -23,7 +23,7 @@ import { imgSrc, imgHero } from "../lib/imageOpt";
 //   2. Each story hero background    -> heroImage below        (2560 x 1440)
 //   3. Each story body / card image  -> image below            (1200 x 900)
 // ------------------------------------------------------------------
-const BLOG_HERO_IMAGE_URL = ""; // CLOUDINARY: banners/blog-hero.jpg (2560 x 1440)
+const BLOG_HERO_IMAGE_URL = "https://res.cloudinary.com/z0afpk9x/image/upload/v1788888834/blog_main_bg.png"; // CLOUDINARY: banners/blog-hero.jpg (2560 x 1440)
 const BLOG_HERO_VIDEO_URL = ""; // CLOUDINARY (optional): banners/blog-hero.mp4 (2560 x 1440)
 
 const POSTS = [
