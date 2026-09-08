@@ -15,6 +15,7 @@ const categoryRoutes = require("./routes/categories");
 const orderRoutes = require("./routes/orders");
 const reviewRoutes = require("./routes/reviews");
 const newsletterRoutes = require("./routes/newsletter");
+const contactRoutes = require("./routes/contact");
 const settingsRoutes = require("./routes/settings");
 const adminRoutes = require("./routes/admin");
 const uploadRoutes = require("./routes/uploads");
@@ -65,12 +66,6 @@ app.use(
   "/api/orders/paystack/webhook",
   express.raw({ type: "application/json", limit: "5mb" })
 );
-// M-Pesa callbacks also arrive as JSON; raw parsing is not strictly required
-// for validation yet but we register it here for future HMAC support.
-app.use(
-  "/api/orders/mpesa/callback",
-  express.raw({ type: "application/json", limit: "5mb" })
-);
 app.use(express.json({ limit: "5mb" }));
 
 // Security: limit repeated requests to authentication endpoints.
@@ -102,6 +97,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/contact", contactRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/uploads", uploadRoutes);

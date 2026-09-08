@@ -574,7 +574,11 @@ router.post("/mpesa/stkpush", optionalAuth, async (req, res) => {
     }
 
     // Safaricom callback URL - must be public for Daraja to reach it
-    const callbackUrl = `${process.env.API_URL || "https://api.zealcollection.com"}/api/orders/mpesa/callback`;
+    const apiBaseUrl = (process.env.API_URL || "").replace(/\/$/, "");
+    if (!apiBaseUrl) {
+      return res.status(503).json({ message: "M-Pesa callback URL is not configured" });
+    }
+    const callbackUrl = `${apiBaseUrl}/api/orders/mpesa/callback`;
 
     console.log(`[M-Pesa] Initiating STK Push for Order ${order.orderNumber}, Phone: ${phoneNumber}, Amount: ${order.total}`);
 

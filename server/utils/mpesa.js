@@ -1,5 +1,9 @@
 const axios = require("axios");
 const moment = require("moment");
+const MPESA_BASE_URL =
+  process.env.MPESA_ENVIRONMENT === "production"
+    ? "https://api.safaricom.co.ke"
+    : "https://sandbox.safaricom.co.ke";
 
 /**
  * M-Pesa Daraja API Utility
@@ -18,7 +22,7 @@ const getAccessToken = async () => {
 
   try {
     const response = await axios.get(
-      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+      `${MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials`,
       {
         headers: {
           Authorization: `Basic ${auth}`,
@@ -68,7 +72,7 @@ const initiateSTKPush = async ({ phoneNumber, amount, orderNumber, callbackUrl }
 
   try {
     const response = await axios.post(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+      `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
       requestBody,
       {
         headers: {
