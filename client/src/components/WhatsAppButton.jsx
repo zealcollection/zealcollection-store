@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { SiWhatsapp } from "react-icons/si";
 
-const WHATSAPP_NUMBER = "254740320749";
+const WHATSAPP_NUMBER = "254718690768";
 const MESSAGE = "Hello Zealc.ollection, I'm interested in one of your pieces.";
 
 export default function WhatsAppButton() {
