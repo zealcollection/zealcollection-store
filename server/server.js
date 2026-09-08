@@ -25,14 +25,37 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ------------------------------------------------------------------
-// Connect to MongoDB
+// CORS
 // ------------------------------------------------------------------
-connectDB();
+// Support one or more frontend origins. CLIENT_URLS is comma-separated so
+// the same backend can serve the Render frontend and local development.
+const configuredOrigins = [
+  process.env.CLIENT_URL,
+  ...(process.env.CLIENT_URLS || "").split(","),
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://zealcollection-store.onrender.com",
+  "https://zealcollection-store-1.onrender.com",
+]
+  .map((origin) => origin && origin.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+const allowedOrigins = new Set(configuredOrigins);
 
 // ------------------------------------------------------------------
 // Middleware
 // ------------------------------------------------------------------
-app.use(cors({ origin: process.env.CLIENT_URL || "https://zealcollection-store-1.onrender.com", credentials: true }));
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Non-browser requests (health checks, curl) do not send an Origin.
+      if (!origin) return callback(null, true);
+      const normalized = origin.replace(/\/$/, "");
+      return callback(null, allowedOrigins.has(normalized));
+    },
+    credentials: true,
+  })
+);
+app.set("trust proxy", 1);
 
 // Paystack webhooks arrive as raw JSON and must bypass the global parser so
 // the HMAC-SHA512 signature can be validated against the raw request body.
@@ -89,15 +112,31 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), { maxAge: "1
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", store: "Zealc.ollection" });
+  const mongoose = require("mongoose");
+  const ready = mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({
+    status: ready ? "ok" : "starting",
+    database: ready ? "connected" : "disconnected",
+    store: "Zealc.ollection",
+  });
 });
 
 // ------------------------------------------------------------------
 // Start
 // ------------------------------------------------------------------
-app.listen(PORT, () => {
-  console.log(`Zealc.ollection server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-});
+async function start() {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Zealc.ollection server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  });
+}
+
+if (require.main === module) {
+  start().catch((error) => {
+    console.error("Server startup failed:", error);
+    process.exit(1);
+  });
+}
 
 module.exports = app;
