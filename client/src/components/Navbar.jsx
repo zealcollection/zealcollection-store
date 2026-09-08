@@ -38,6 +38,16 @@ const drawerLinks = [
   { label: "Contact", path: "/contact" },
 ];
 
+// ------------------------------------------------------------------
+// Routes that open straight into a plain, light-background section
+// instead of a full-bleed dark hero image. On those pages the header
+// needs to start in its "solid" (light background + dark text) state
+// right away - otherwise the ivory/white nav links are invisible
+// against the page until the user scrolls past the 60px threshold.
+// Add any other hero-less route paths here as you create them.
+// ------------------------------------------------------------------
+const NO_HERO_ROUTES = ["/contact", "/faq"];
+
 export default function Navbar() {
   const { cartTotals, wishlistState, isAuthenticated, auth, logout } = useApp();
   // Defensive fallback: if wishlistState (or .items) is ever undefined -
@@ -83,7 +93,8 @@ export default function Navbar() {
     };
   }, []);
 
-  const isHome = location.pathname === "/";
+  // True on routes that don't have a dark hero banner to sit over.
+  const hasNoHero = NO_HERO_ROUTES.includes(location.pathname);
 
   useEffect(() => {
     let ticking = false;
@@ -127,7 +138,9 @@ export default function Navbar() {
     setSearchInput("");
   };
 
-  const solid = scrolled;
+  // Solid (light background + dark text) once scrolled, OR immediately
+  // on routes with no dark hero to sit over.
+  const solid = scrolled || hasNoHero;
 
   const linkClass = (path) =>
     `inline-block text-[15px] tracking-[0.15em] uppercase font-semibold transition-colors duration-300 whitespace-nowrap ${
