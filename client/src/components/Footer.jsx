@@ -92,9 +92,9 @@ export default function Footer() {
         </>
       ) : null}
       <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 lg:gap-10">
           {/* Brand */}
-          <div>
+          <div className="sm:col-span-2 md:col-span-1">
             {FOOTER_BACKGROUND ? (
               <div className="bg-ivory/95 inline-block p-5 rounded-sm mb-6 shadow-lg">
                 <img
@@ -115,12 +115,12 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Explore + Follow */}
+          {/* Explore */}
           <div>
             <h3 className={`text-[11px] tracking-[0.35em] uppercase ${muted} mb-6`}>
               Explore
             </h3>
-            <ul className="space-y-3 mb-10">
+            <ul className="space-y-3">
               <li>
                 <Link to="/shop" className={`text-sm ${body} hover:text-gold-dark transition-colors`}>
                   Shop all
@@ -134,14 +134,17 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
 
+          {/* Follow */}
+          <div>
             <h3 className={`text-[11px] tracking-[0.35em] uppercase ${muted} mb-6`}>
               Follow
             </h3>
             <ul className="space-y-3">
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/Zealc.ollection/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`text-sm ${body} hover:text-gold-dark transition-colors inline-flex items-center gap-1`}
@@ -165,7 +168,7 @@ export default function Footer() {
             <h3 className={`text-[11px] tracking-[0.35em] uppercase ${muted} mb-6`}>
               About
             </h3>
-            <ul className="space-y-3 mb-10">
+            <ul className="space-y-3">
               <li>
                 <Link to="/about" className={`text-sm ${body} hover:text-gold-dark transition-colors`}>
                   Our story
