@@ -146,7 +146,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className={`text-sm ${body} hover:text-gold-dark transition-colors inline-flex items-center gap-1`}
                 >
-                  Instagram <span aria-hidden className="text-xs">&#8599;</span>
+                  Instagram <span aria-hidden className="text-xs">Zealc.ollection</span>
                 </a>
               </li>
               <li>
@@ -154,7 +154,7 @@ export default function Footer() {
                   href="mailto:zealc.ollection28@gmail.com"
                   className={`text-sm ${body} hover:text-gold-dark transition-colors inline-flex items-center gap-1`}
                 >
-                  Email <span aria-hidden className="text-xs">&#8599;</span>
+                  Email <span aria-hidden className="text-xs">zealc.ollection28@gmail.com</span>
                 </a>
               </li>
             </ul>

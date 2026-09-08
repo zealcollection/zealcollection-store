@@ -851,11 +851,6 @@ function HeroSections({ categories, categoriesLoading, bestSellersList, newArriv
               movement, the grain of hand-selected leather, and the fall of
               pure silk against the skin.
             </p>
-            <p className="text-onyx/60 leading-relaxed mb-9 font-body">
-              Every piece passes through the hands of master artisans before it
-              reaches you. We create fewer pieces, more beautifully, for those
-              who understand the difference.
-            </p>
             <Link to="/about" className="btn-luxury">
               Discover Our Heritage
             </Link>
@@ -877,20 +872,20 @@ function HeroSections({ categories, categoriesLoading, bestSellersList, newArriv
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {[
             {
-              icon: "Authenticity Guaranteed",
-              text: "Every piece is verified and accompanied by a certificate of authenticity.",
+              icon: "Quality Products",
+              text: "We stock carefully selected, top-tier items for durability and performance.",
             },
             {
-              icon: "Complimentary Delivery",
-              text: "Worldwide insured delivery on orders over 150, presented in signature packaging.",
+              icon: "Fast Delivery",
+              text: "We process and ship your orders quickly so you get what you need without long delays.",
             },
             {
-              icon: "Two-Year Warranty",
-              text: "All timepieces and leather goods are protected by our comprehensive warranty.",
+              icon: "Secure Checkout",
+              text: " Our platform uses advanced encryption technology to ensure your personal and payment details are completely safe.",
             },
             {
-              icon: "Master Craftsmanship",
-              text: "Hand-finished by artisans with decades of experience in luxury manufacture.",
+              icon: "Transparent Pricing",
+              text: "We offer fair, competitive prices with no hidden fees or unexpected costs at checkout.",
             },
           ].map((item, index) => (
             <AnimatedSection key={item.icon} delay={0.15 + index * 0.15} className="text-center">
@@ -914,7 +909,7 @@ function HeroSections({ categories, categoriesLoading, bestSellersList, newArriv
           <AnimatedSection className="text-center mb-14">
             <p className="eyebrow mb-4">Client experiences</p>
             <h2 className="font-display text-ivory text-3xl md:text-5xl">
-              Kind words
+              Reviews from our customers
             </h2>
           </AnimatedSection>
 
@@ -990,11 +985,6 @@ function HeroSections({ categories, categoriesLoading, bestSellersList, newArriv
           ))}
         </div>
       </section>
-
-      {/* ------------------------------------------------------------------
-          9. NEWSLETTER
-      ------------------------------------------------------------------ */}
-      <NewsletterSection />
     </>
   );
 }

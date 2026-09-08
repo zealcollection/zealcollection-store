@@ -51,7 +51,7 @@ export default function Contact() {
 
   return (
     <>
-      <SEO title="Contact" description="Get in touch with the Zealc.ollection concierge team." />
+      <SEO title="Contact" description="Get in touch with the Zealc.ollection team." />
 
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-[120px] md:pt-[210px] pb-12 md:pb-16">
         <div className="text-center mb-14">
@@ -73,7 +73,7 @@ export default function Contact() {
               >
                 <p className="font-display text-2xl mb-3">Message Received</p>
                 <p className="text-onyx/60 text-sm mb-8">
-                  Thank you for contacting Zealc.ollection. A member of our concierge
+                  Thank you for contacting Zealc.ollection. A member of our
                   team will respond within one business day.
                 </p>
                 <button
@@ -160,7 +160,7 @@ export default function Contact() {
                 {CONTACT_IMAGE ? (
                   <img
                     src={CONTACT_IMAGE}
-                    alt="Zealc.ollection flagship boutique"
+                    alt="Zealc.ollection"
                     loading="lazy"
                     className="w-full h-full object-cover"
                   />
