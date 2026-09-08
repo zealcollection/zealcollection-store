@@ -9,7 +9,7 @@ const FAQ_ITEMS = [
   {
     question: "How do I place an order?",
     answer:
-      "Browse our collection, select your desired size and color, then click Add to Cart. When you are ready, proceed to Checkout, enter your shipping details and choose your preferred payment method (Paystack, Stripe or Cash on Delivery). You will receive an email confirmation once your order is placed.",
+"Browse our collection and select your desired item. Click Add to Cart and proceed to Checkout when you are ready. Enter your shipping details and complete your payment via M-Pesa Send Money. You will receive an order confirmation once your order is placed>"
   },
   {
     question: "What payment methods do you accept?",
@@ -25,11 +25,6 @@ const FAQ_ITEMS = [
     question: "What is your return policy?",
     answer:
       "You may return any unworn item in its original condition and packaging within 14 days of delivery for a 90% refund of the purchase price. Items must be returned with all original packaging, tags, and accessories.",
-  },
-  {
-    question: "Are your products authentic?",
-    answer:
-      "Absolutely. Every Zealc.ollection piece is verified by our master artisans and accompanied by a certificate of authenticity. We do not sell, distribute or stock third-party goods of any kind.",
   },
   {
     question: "How can I track my order?",
