@@ -55,8 +55,23 @@ function cartItemKey(item) {
 function isSameCartItem(item, payload) {
   return cartItemKey(item) === cartItemKey(payload);
 }
+
+// Defensive parse: corrupted or unexpected localStorage content (a stray
+// literal "undefined" string, truncated JSON, etc.) used to throw here at
+// MODULE LOAD TIME - before the app even renders - taking down the whole
+// site. Falling back to [] on any parse failure or non-array result means
+// a bad localStorage value can never crash the app again.
+function readLocalArray(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 const cartInitialState = {
-  items: JSON.parse(localStorage.getItem("cart") || "[]"),
+  items: readLocalArray("cart"),
 };
 
 function cartReducer(state, action) {
@@ -107,7 +122,7 @@ function cartReducer(state, action) {
 // Wishlist reducer (persists guest wishlist in localStorage)
 // ---------------------------------------------------------------
 const wishlistInitialState = {
-  items: JSON.parse(localStorage.getItem("wishlist") || "[]"),
+  items: readLocalArray("wishlist"),
   synced: false,
 };
 
@@ -124,7 +139,19 @@ function wishlistReducer(state, action) {
       return { ...state, items: updated };
     }
     case "SET_WISHLIST":
-      return { ...state, items: action.payload, synced: true };
+      // Defensive: `action.payload` comes straight from the API response
+      // (data.wishlist). If the backend ever returns something other than
+      // an array here - a shape mismatch, an error response, a stale/
+      // invalidated auth token, etc. - this used to set `items` to
+      // `undefined` directly, which crashed the ENTIRE site on every page
+      // (Navbar reads wishlistState.items.length on every route). Falling
+      // back to the previous items means a bad API response can never
+      // again take down the whole app.
+      return {
+        ...state,
+        items: Array.isArray(action.payload) ? action.payload : state.items,
+        synced: true,
+      };
     default:
       return state;
   }

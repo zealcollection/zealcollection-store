@@ -39,6 +39,13 @@ const drawerLinks = [
 
 export default function Navbar() {
   const { cartTotals, wishlistState, isAuthenticated, auth, logout } = useApp();
+  // Defensive fallback: if wishlistState (or .items) is ever undefined -
+  // e.g. momentarily during initial context render, after a failed fetch,
+  // or a bad localStorage read - this guarantees `.items` is always a
+  // real array, so `.length` below can never crash the ENTIRE site (this
+  // component renders inside Layout on every single route).
+  const wishlistItems = wishlistState?.items || [];
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -398,9 +405,9 @@ export default function Navbar() {
                 }`}
               >
                 <Heart size={24} />
-                {wishlistState.items.length > 0 && (
+                {wishlistItems.length > 0 && (
                   <span className="absolute -top-0.5 right-0 bg-gold text-onyx text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
-                    {wishlistState.items.length}
+                    {wishlistItems.length}
                   </span>
                 )}
               </Link>
@@ -620,9 +627,9 @@ export default function Navbar() {
                     <span className="flex items-center gap-3">
                       <Heart size={14} className="text-gold" /> Wishlist
                     </span>
-                    {wishlistState.items.length > 0 && (
+                    {wishlistItems.length > 0 && (
                       <span className="bg-gold text-onyx text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
-                        {wishlistState.items.length}
+                        {wishlistItems.length}
                       </span>
                     )}
                   </Link>

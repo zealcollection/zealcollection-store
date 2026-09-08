@@ -31,14 +31,21 @@ import ShippingReturns from "./pages/ShippingReturns";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function AdminOnly({ children }) {
-  const { auth, loadingAuth } = useApp();
+  const { auth } = useApp();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!loadingAuth) {
+    // auth.loading is the real flag (set in AppContext's authReducer,
+    // starts true, flips false once authAPI.me() resolves or fails).
+    // This used to destructure a nonexistent `loadingAuth` from useApp(),
+    // which is always undefined - so `ready` was being set to true on the
+    // very first render, before the app had actually confirmed who (if
+    // anyone) is logged in. That could deny a real admin access if this
+    // component rendered before auth.user was populated.
+    if (!auth.loading) {
       setReady(true);
     }
-  }, [loadingAuth]);
+  }, [auth.loading]);
 
   if (!ready) {
     return null;
