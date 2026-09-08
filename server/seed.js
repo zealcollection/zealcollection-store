@@ -1,7 +1,21 @@
 // ------------------------------------------------------------------
 // Zealc.ollection database seeder
-// Run once to populate categories, products, a demo coupon and
-// an admin account:  node seed.js
+// Populates DEMO categories, products and a demo coupon.
+// Run once, on a FRESH/empty database only:  node seed.js --confirm
+//
+// SAFETY GUARD: this script permanently deletes every existing Product,
+// Category and Coupon document before reseeding demo data - there is no
+// undo. It used to run that wipe unconditionally the moment the script
+// started, with no confirmation of any kind. If it is ever run against a
+// database that already has real admin-entered products (for example by
+// running `npm run seed` locally while .env's MONGO_URI happens to point
+// at the production database, which is an extremely easy mix-up), it
+// silently destroys all of that real data and replaces it with these demo
+// placeholders. This is very likely what happened before this fix.
+//
+// To run it now, you must explicitly pass --confirm:
+//   node seed.js --confirm
+// Without that flag, the script refuses to run and makes no changes.
 //
 // IMAGE NOTE: Products are seeded with CLOUDINARY placeholder URLs
 // that follow the pattern res.cloudinary.com/demo/... so the site
@@ -15,13 +29,23 @@ const connectDB = require("./config/db");
 const Category = require("./models/Category");
 const Product = require("./models/Product");
 const Coupon = require("./models/Coupon");
-const User = require("./models/User");
 
 const IMG = (keyword) =>
   `https://res.cloudinary.com/demo/image/upload/${keyword}.jpg`;
 
 async function seed() {
+  if (!process.argv.includes("--confirm")) {
+    console.error(
+      "\nRefusing to run: this script DELETES every existing product, category and coupon.\n" +
+        "Re-run with an explicit confirmation flag once you are certain this is a\n" +
+        "database you actually want wiped and reseeded with demo data:\n\n" +
+        "    node seed.js --confirm\n"
+    );
+    process.exit(1);
+  }
+
   await connectDB();
+  console.log("Connected to", mongoose.connection.name);
 
   console.log("Clearing existing data...");
   await Promise.all([
@@ -232,21 +256,16 @@ async function seed() {
   console.log("Welcome coupon Zealc.ollection10 seeded");
 
   // ---- Admin account ----
-  const existingAdmin = await User.findOne({ email: "admin@zealcollection.com" });
-  if (!existingAdmin) {
-    await User.create({
-      name: "Zealc.ollection Administrator",
-      email: "admin@zealcollection.com",
-      password: "admin123456",
-      role: "admin",
-    });
-    console.log("Admin account created (admin@zealcollection.com / admin123456)");
-    console.log("IMPORTANT: Change the admin password after first login");
-  } else {
-    console.log("Admin account already exists");
-  }
-
-  console.log("Seeding complete");
+  // This used to create a SECOND, separate admin account here with a
+  // hardcoded email and a weak, publicly-known password
+  // (admin@zealcollection.com / admin123456) - a real security risk once
+  // committed to source control, and a second admin login that had nothing
+  // to do with the one actually configured for this store. Admin account
+  // creation now lives in exactly one place: ensure-admin.js, which reads
+  // SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD from your .env instead of
+  // hardcoding credentials in a script.
+  console.log("Seeding complete.");
+  console.log("To create or reset the admin account, run: node ensure-admin.js");
   process.exit(0);
 }
 
