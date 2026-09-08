@@ -93,10 +93,10 @@ export default function About() {
       .catch(() => {});
   }, []);
   const defaultValues = [
-    { title: "Uncompromising Quality", text: "Every piece is inspected against 47 quality checkpoints before it leaves our atelier." },
-    { title: "Rare Materials", text: "We source only the finest leathers, metals and textiles from certified ethical suppliers." },
-    { title: "Timeless Design", text: "Our pieces are designed to be cherished for decades, not discarded after a season." },
-    { title: "Conscious Luxury", text: "Sustainability is woven into every decision, from packaging to production methods." },
+    { title: "Uncompromising Quality", text: "Every timepiece in our collection is carefully selected for its quality, design, and attention to detail, so you can shop with confidence." },
+    { title: "Rare Materials", text: "We carefully select timepieces crafted with quality materials, refined finishes, and attention to detail, bringing you watches that combine style, durability, and timeless appeal." },
+    { title: "Timeless Design", text: "Timeless watches chosen to become lasting pieces in your collection, season after season." },
+    { title: "Conscious Luxury", text: "Thoughtful choices go into every detail, from the watches we curate to the way they are presented and delivered." },
   ];
   const values = cms.aboutValues.length > 0
     ? defaultValues.map((v, i) => ({ ...v, ...(cms.aboutValues[i] || {}) }))
@@ -178,11 +178,11 @@ export default function About() {
             </h2>
             <p className="text-onyx/70 leading-relaxed mb-5 font-body">
               {cms.aboutStoryIntro ||
-                "Zealc.ollection began with a simple conviction: that true luxury does not need to announce itself. In a world of noise, we chose restraint. Each timepiece, handbag and garment that bears our name is the product of hundreds of hours of meticulous work by artisans whose skills have been refined over generations."}
+                "Zeal Collection began with a simple conviction: that true luxury does not need to announce itself. In a world of noise, we chose restraint.We carefully curate watches and handbags that embody timeless style, elegance, and sophistication. Every piece in our collection is selected with an eye for quality, design, and the details that make an accessory truly stand out."}
             </p>
             <p className="text-onyx/70 leading-relaxed mb-5 font-body">
               {cms.aboutStoryBody ||
-                "From the sourcing of ethically mined materials to the final polish of a clasp, we hold every stage of production to a standard that would satisfy only the most exacting eye. The result is a collection that feels inevitable, as though it has always existed."}
+                "From refined timepieces to statement handbags, Zeal Collection brings together pieces designed to complement your personal style and elevate every occasion. For us, luxury is about choosing well, wearing confidently, and embracing elegance without excess."}
             </p>
             <p className="text-onyx/70 leading-relaxed font-body">
               {cms.aboutStoryClosing || "We do not follow seasons. We follow permanence."}
@@ -237,19 +237,17 @@ export default function About() {
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-20 md:py-28">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <AnimatedSection delay={0.1}>
-            <p className="eyebrow mb-4">The Atelier</p>
+            <p className="eyebrow mb-4">The Collection</p>
             <h2 className="section-heading text-3xl md:text-4xl mb-6 leading-tight">
-              {cms.aboutAtelierTitle ? (
-                cms.aboutAtelierTitle
+              {cms.aboutCollectionTitle ? (
+                cms.aboutCollectionTitle
               ) : (
-                <>Where Hours Become <em className="text-gold-dark">Heirlooms</em></>
+                <>Where Style Meets <em className="text-gold-dark">Selection</em></>
               )}
             </h2>
             <p className="text-onyx/70 leading-relaxed mb-8 font-body">
-              Behind every Zealc.ollection piece is a workshop where tradition meets
-              precision. Our master watchmakers, leather artisans and seamstresses
-              work with tools and techniques passed down through generations,
-              ensuring that each creation carries the warmth of the human hand.
+Behind every piece at Zeal Collection is a careful selection process. We search for watches and handbags that reflect timeless style, quality, and sophistication.
+From elegant timepieces to versatile handbags, each piece is chosen with attention to design, finish, and the details that make it worth adding to your collection. We believe great style is not about having more—it is about choosing pieces that feel right.
             </p>
             <Link to="/shop" className="btn-gold">
               Explore the Collection
@@ -274,7 +272,7 @@ export default function About() {
               </div>
               <figcaption className="flex items-center justify-between px-5 py-3 border-t border-gold/25 bg-ivory">
                 <span className="text-[10px] tracking-[0.3em] uppercase text-onyx/50">
-                  The Atelier
+                  The Collection
                 </span>
                 <span className="h-px w-10 bg-gold/60" />
               </figcaption>
@@ -301,10 +299,10 @@ export default function About() {
 
           <AnimatedSection delay={0.15} className="text-center mt-12">
             <p className="text-ivory/55 mb-6 font-body">
-              Still have a question? Our concierge team is happy to assist.
+              Still have a question? Our customer service team is happy to assist.
             </p>
             <Link to="/contact" className="btn-gold">
-              Contact the Maison
+              Contact Us
             </Link>
           </AnimatedSection>
         </div>
