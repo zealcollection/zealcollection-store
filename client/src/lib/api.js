@@ -1,6 +1,13 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+// Render environment variables are often entered as the backend origin
+// without /api. Normalizing here prevents requests such as /products and
+// /auth/login from bypassing the Express route prefix in production.
+const configuredBaseUrl = String(import.meta.env.VITE_API_BASE_URL || "/api").trim();
+const API_BASE_URL =
+  configuredBaseUrl === "/api" || configuredBaseUrl.endsWith("/api")
+    ? configuredBaseUrl.replace(/\/+$/, "")
+    : `${configuredBaseUrl.replace(/\/+$/, "")}/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
