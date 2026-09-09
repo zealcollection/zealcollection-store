@@ -70,7 +70,13 @@ const orderSchema = new mongoose.Schema(
 orderSchema.pre("save", function (next) {
   if (!this.orderNumber) {
     const year = new Date().getFullYear().toString().slice(-2);
-    this.orderNumber = `ZC-${year}-${uuidv4().slice(0, 8).toUpperCase()}`;
+    const firstName = String(this.shipping?.name || "Guest")
+      .trim()
+      .split(/\s+/)[0]
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 16)
+      .toUpperCase() || "GUEST";
+    this.orderNumber = `ZC-${year}-${firstName}-${uuidv4().slice(0, 8).toUpperCase()}`;
   }
   next();
 });

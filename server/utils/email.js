@@ -31,6 +31,9 @@ const sendEmail = async ({ to, subject, html }) => {
 };
 
 const sendOrderConfirmation = async (order, userEmail) => {
+  const firstName = String(order.shipping?.name || "Customer")
+    .trim()
+    .split(/\s+/)[0] || "Customer";
   const itemsHtml = order.items
     .map(
       (item) => `
@@ -45,11 +48,11 @@ const sendOrderConfirmation = async (order, userEmail) => {
 
   await sendEmail({
     to: userEmail,
-    subject: `Zealc.ollection Order Confirmation - ${order.orderNumber}`,
+    subject: `${firstName}, your Zealc.ollection order ${order.orderNumber} is confirmed`,
     html: `
       <div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;color:#1a1a1a;">
         <h1 style="letter-spacing:0.3em;font-size:24px;text-align:center;margin-bottom:24px;">Zealc.ollection</h1>
-        <p style="color:#555;">Thank you for your order. Your reference number is <strong>${order.orderNumber}</strong>.</p>
+        <p style="color:#555;">Hello ${firstName}, thank you for your order. Your confirmation number is <strong>${order.orderNumber}</strong>.</p>
         <table style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="text-align:left;">
