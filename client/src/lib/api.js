@@ -162,6 +162,7 @@ export const adminAPI = {
   deleteSubscriber: (id) => api.delete(`/admin/newsletter/subscribers/${id}`),
   // Analytics
   getAnalytics: () => api.get("/admin/analytics"),
+  resetAnalytics: () => api.post("/admin/analytics/reset"),
   // Site settings (CMS)
   getSettings: () => api.get("/admin/settings"),
   updateSettings: (data) => api.put("/admin/settings", data),

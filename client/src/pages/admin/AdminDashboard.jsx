@@ -85,61 +85,59 @@ export default function AdminDashboard() {
   }, [tab]);
 
   async function loadData() {
+    setLoading(true);
     try {
-      setLoading(true);
-      const data = await adminAPI.getAnalytics();
-      setAnalytics(data.data?.analytics || data.analytics || null);
-    } catch {
-      /* analytics unavailable */
-    }
-
-    try {
-      const res = await adminAPI.getProducts();
-      setProducts(res.data.products || []);
-    } catch {
-      setProducts([]);
-    }
-    try {
-      const res = await adminAPI.getCategories();
-      setCategories(res.data.categories || []);
-    } catch {
-      setCategories([]);
-    }
-    try {
-      const res = await adminAPI.getOrders();
-      setOrders(res.data.orders || []);
-    } catch {
-      setOrders([]);
-    }
-    try {
-      const res = await adminAPI.getCustomers();
-      setCustomers(res.data.users || res.data.customers || []);
-    } catch {
-      setCustomers([]);
-    }
-    try {
-      const res = await adminAPI.getReviews();
-      setReviews(res.data.reviews || []);
-    } catch {
-      setReviews([]);
-    }
-    try {
-      const res = await adminAPI.getCoupons();
-      setCoupons(res.data.coupons || []);
-    } catch {
-      setCoupons([]);
-    }
-    try {
-      const res = await adminAPI.getSubscribers();
-      setSubscribers(res.data.subscribers || []);
-    } catch {
-      setSubscribers([]);
+      if (tab === "analytics") {
+        const res = await adminAPI.getAnalytics();
+        setAnalytics(res.data?.analytics || res.analytics || null);
+      } else if (tab === "products") {
+        const [productsRes, categoriesRes] = await Promise.all([
+          adminAPI.getProducts(),
+          adminAPI.getCategories(),
+        ]);
+        setProducts(productsRes.data.products || []);
+        setCategories(categoriesRes.data.categories || []);
+      } else if (tab === "categories") {
+        const res = await adminAPI.getCategories();
+        setCategories(res.data.categories || []);
+      } else if (tab === "orders") {
+        const res = await adminAPI.getOrders();
+        setOrders(res.data.orders || []);
+      } else if (tab === "customers") {
+        const res = await adminAPI.getCustomers();
+        setCustomers(res.data.users || res.data.customers || []);
+      } else if (tab === "reviews") {
+        const res = await adminAPI.getReviews();
+        setReviews(res.data.reviews || []);
+      } else if (tab === "coupons") {
+        const res = await adminAPI.getCoupons();
+        setCoupons(res.data.coupons || []);
+      } else if (tab === "newsletter") {
+        const res = await adminAPI.getSubscribers();
+        setSubscribers(res.data.subscribers || []);
+      }
+    } catch (error) {
+      toast.error(error.message || "Could not load this section");
     } finally {
       setLoading(false);
     }
   }
 
   const refreshAll = () => loadData();
+
+  const resetAnalytics = async () => {
+    if (!window.confirm("Reset the analytics baseline now? Existing orders and products will not be deleted, but older activity will no longer appear in the analytics totals.")) {
+      return;
+    }
+    try {
+      const res = await adminAPI.resetAnalytics();
+      const analyticsRes = await adminAPI.getAnalytics();
+      setAnalytics(analyticsRes.data?.analytics || analyticsRes.analytics || null);
+      toast.success(res.data?.message || "Analytics baseline reset");
+    } catch (error) {
+      toast.error(error.message || "Could not reset analytics");
+    }
+  };
 
   return (
     <>
@@ -186,7 +184,7 @@ export default function AdminDashboard() {
                 {loading && tab === "analytics" ? (
                   <div className="border border-mist p-10 text-center text-sm text-onyx/50">Loading...</div>
                 ) : tab === "analytics" ? (
-                  <AnalyticsTab analytics={analytics} />
+                  <AnalyticsTab analytics={analytics} onReset={resetAnalytics} />
                 ) : tab === "products" ? (
                   <ProductsTab
                     products={products}
@@ -234,7 +232,7 @@ export default function AdminDashboard() {
 // ------------------------------------------------------------------
 // Analytics tab
 // ------------------------------------------------------------------
-function AnalyticsTab({ analytics }) {
+function AnalyticsTab({ analytics, onReset }) {
   const stats = [
     {
       label: "Total Revenue",
@@ -260,6 +258,23 @@ function AnalyticsTab({ analytics }) {
 
   return (
     <div>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="font-display text-xl">Analytics overview</h2>
+          <p className="text-[11px] text-onyx/50 mt-1">
+            {analytics?.resetAt
+              ? `Showing activity since ${new Date(analytics.resetAt).toLocaleString()}`
+              : "Showing all recorded activity"}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onReset}
+          className="border border-onyx/20 px-4 py-2.5 text-[10px] tracking-[0.16em] uppercase hover:border-gold hover:text-gold-dark transition-colors"
+        >
+          Reset analytics baseline
+        </button>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
         {stats.map((stat) => (
           <div key={stat.label} className="border border-mist p-6 flex items-center gap-5">
@@ -1193,7 +1208,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
       ) : (
         <div className="space-y-4">
           {filtered.map((order) => (
-            <div key={order._id} className="border border-mist p-5">
+            <div key={order._id} className="border border-mist bg-ivory p-5 md:p-6 shadow-[0_8px_30px_rgba(26,26,26,0.04)]">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
                   <p className="text-[10px] tracking-[0.2em] uppercase text-onyx/50">Order</p>
@@ -1226,20 +1241,26 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                   <span className="font-display text-lg ml-2">{formatPrice(order.total)}</span>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {order.items?.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 text-sm">
-                    <div className="w-9 h-11 bg-mist shrink-0 overflow-hidden">
+                  <div key={index} className="flex items-center gap-4 border border-mist/80 bg-mist/25 p-3 text-sm min-w-0">
+                    <div className="w-16 h-20 md:w-20 md:h-24 bg-mist shrink-0 overflow-hidden">
                       {item.image ? (
-                        <img src={imgThumb(item.image)} alt={item.name} className="w-full h-full object-cover" />
+                        <img
+                          src={imgThumb(item.image)}
+                          alt={item.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-onyx/20 text-[7px]">IMG</div>
+                        <div className="w-full h-full flex items-center justify-center text-onyx/20 text-[8px] tracking-[0.15em]">NO IMAGE</div>
                       )}
                     </div>
-                    <span className="truncate flex flex-col min-w-0">
-                      <span className="truncate">{item.name} x{item.quantity}</span>
+                    <span className="flex flex-col min-w-0 gap-1">
+                      <span className="font-medium leading-snug">{item.name}</span>
+                      <span className="text-[11px] text-onyx/55">Quantity: {item.quantity}</span>
                       {item.variant || item.color || item.photoLabel ? (
-                        <span className="text-[9px] tracking-[0.15em] uppercase text-onyx/45 truncate">
+                        <span className="text-[9px] tracking-[0.12em] uppercase text-onyx/45 truncate">
                           {[item.photoLabel, item.variant && `Size ${item.variant}`, item.color && `Colour ${item.color}`]
                             .filter(Boolean)
                             .join(" / ")}
