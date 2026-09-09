@@ -154,10 +154,11 @@ export function OptimisedImg({ src, alt, className = "", fill = false, ...rest }
   // leaving the picture frozen invisible. Detect that here.
   const imageRef = useRef(null);
   useEffect(() => {
+    setLoaded(false);
     const el = imageRef.current;
     if (!el) return;
     if (el.complete && el.naturalWidth > 0) setLoaded(true);
-  }, []);
+  }, [src]);
 
   // While the photo is still downloading it stays hidden (opacity-0).
   // The fade-in animation itself is left to the caller's classes (see

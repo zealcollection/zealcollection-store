@@ -26,6 +26,11 @@ export default function ProductCard({ product, index = 0 }) {
   // and it will not override the manual selection until the next hover.
   const manuallySet = useRef(false);
 
+  useEffect(() => {
+    setIdx(0);
+    manuallySet.current = false;
+  }, [product._id]);
+
   const go = useCallback(
     (dir) => {
       // Manual navigation overrides the cycle - the picked photo stays on screen.
@@ -145,17 +150,14 @@ export default function ProductCard({ product, index = 0 }) {
           {/* Pre-rendered photo stack: smooth opacity crossfade, never clipped */}
           {photos[0] ? (
             <>
-              {photos.map((src, i) => (
-                <OptimisedImg
-                  key={i}
-                  src={imgCard(src)}
-                  alt={`${product.name} — photo ${i + 1}`}
-                  aria-hidden={i !== idx}
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    i === idx ? "opacity-100 zo-fade-in" : "opacity-0"
-                  } group-hover:scale-[1.03] group-hover:duration-[1800ms]`}
-                />
-              ))}
+              <OptimisedImg
+                key={`${product._id}-${idx}`}
+                src={imgCard(photos[idx])}
+                alt={`${product.name} — photo ${idx + 1}`}
+                loading={index < 4 ? "eager" : "lazy"}
+                fetchPriority={index < 2 ? "high" : "auto"}
+                className="absolute inset-0 w-full h-full object-cover zo-fade-in group-hover:scale-[1.03] group-hover:duration-[1800ms]"
+              />
 
               {/* Gallery dot indicators */}
               {multi && (

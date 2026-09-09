@@ -46,6 +46,11 @@ export default function ProductDetails() {
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(false);
+    setProduct(null);
+    setRelated([]);
+    setSelectedImage(0);
     async function load() {
       try {
         const { data } = await productsAPI.getBySlug(slugOrId);
@@ -110,15 +115,19 @@ export default function ProductDetails() {
   // ------------------------------------------------------------------
   useEffect(() => {
     if (!images.length) return;
-    images.forEach((img, i) => {
-      if (i === 0) return; // the cover is already rendering
+    const preloadLinks = [];
+    // Preload only the next gallery image. Preloading every full-detail photo
+    // competes with the selected image and makes navigation feel slow on mobile.
+    const nextImage = images[1];
+    if (nextImage) {
       const link = document.createElement("link");
       link.rel = "preload";
       link.as = "image";
-      link.href = imgDetail(img);
+      link.href = imgDetail(nextImage);
       document.head.appendChild(link);
-      return () => link.remove();
-    });
+      preloadLinks.push(link);
+    }
+    return () => preloadLinks.forEach((link) => link.remove());
   }, [images]);
 
   // ------------------------------------------------------------------
@@ -276,6 +285,9 @@ export default function ProductDetails() {
                   transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                   src={imgDetail(displayImage)}
                   alt={`${product.name} - ${selectedColor ? selectedColor + " colour" : `view ${selectedImage + 1}`}`}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full h-full object-cover cursor-zoom-in"
                   style={{ willChange: "opacity, transform" }}
                 />
