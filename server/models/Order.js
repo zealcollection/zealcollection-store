@@ -81,4 +81,7 @@ orderSchema.pre("save", function (next) {
   next();
 });
 
+orderSchema.index({ paymentStatus: 1, createdAt: 1 });
+orderSchema.index({ orderStatus: 1, createdAt: 1 });
+
 module.exports = mongoose.model("Order", orderSchema);

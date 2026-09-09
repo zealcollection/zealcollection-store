@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Review = require("../models/Review");
 const Coupon = require("../models/Coupon");
 const Subscriber = require("../models/Subscriber");
+const AnalyticsState = require("../models/AnalyticsState");
 const { protect, admin } = require("../middleware/auth");
 
 const router = express.Router();
@@ -18,33 +19,44 @@ router.use(protect, admin);
 // ------------------------------------------------------------------
 router.get("/analytics", async (req, res) => {
   try {
-    const totalRevenue = await Order.aggregate([
-      { $match: { paymentStatus: "paid" } },
-      { $group: { _id: null, total: { $sum: "$total" } } },
-    ]);
+    const state = await AnalyticsState.findOne({ key: "default" }).lean();
+    const resetAt = state?.resetAt || null;
+    const orderMatch = resetAt ? { createdAt: { $gte: resetAt } } : {};
+    const paidMatch = { ...orderMatch, paymentStatus: "paid" };
 
-    const revenueByMonth = await Order.aggregate([
-      { $match: { paymentStatus: "paid" } },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-          revenue: { $sum: "$total" },
-          orders: { $sum: 1 },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
-
-    const ordersByStatus = await Order.aggregate([
-      { $group: { _id: "$orderStatus", count: { $sum: 1 } } },
-    ]);
+    const [revenueSummary, revenueByMonth, ordersByStatus, totalOrders, totalCustomers, totalProducts] =
+      await Promise.all([
+        Order.aggregate([
+          { $match: paidMatch },
+          { $group: { _id: null, total: { $sum: "$total" } } },
+        ]),
+        Order.aggregate([
+          { $match: paidMatch },
+          {
+            $group: {
+              _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+              revenue: { $sum: "$total" },
+              orders: { $sum: 1 },
+            },
+          },
+          { $sort: { _id: 1 } },
+        ]),
+        Order.aggregate([
+          { $match: orderMatch },
+          { $group: { _id: "$orderStatus", count: { $sum: 1 } } },
+        ]),
+        Order.countDocuments(orderMatch),
+        User.countDocuments(resetAt ? { createdAt: { $gte: resetAt } } : {}),
+        Product.countDocuments(),
+      ]);
 
     res.json({
       analytics: {
-        totalRevenue: totalRevenue[0]?.total || 0,
-        totalOrders: await Order.countDocuments(),
-        totalCustomers: await User.countDocuments(),
-        totalProducts: await Product.countDocuments(),
+        totalRevenue: revenueSummary[0]?.total || 0,
+        totalOrders,
+        totalCustomers,
+        totalProducts,
+        resetAt,
         maxMonthlyRevenue:
           revenueByMonth.length > 0
             ? Math.max(...revenueByMonth.map((r) => r.revenue))
@@ -61,7 +73,24 @@ router.get("/analytics", async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("[Admin analytics] Failed to load:", error);
     res.status(500).json({ message: "Failed to load analytics" });
+  }
+});
+
+// Reset the reporting baseline without deleting orders, customers, or products.
+router.post("/analytics/reset", async (req, res) => {
+  try {
+    const resetAt = new Date();
+    await AnalyticsState.findOneAndUpdate(
+      { key: "default" },
+      { $set: { resetAt } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    res.json({ resetAt, message: "Analytics baseline reset" });
+  } catch (error) {
+    console.error("[Admin analytics] Failed to reset:", error);
+    res.status(500).json({ message: "Failed to reset analytics" });
   }
 });
 
