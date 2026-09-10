@@ -82,6 +82,7 @@ export const ordersAPI = {
   getMyOrders: () => api.get("/orders/me"),
   getById: (id) => api.get(`/orders/${id}`),
   getByNumber: (number) => api.get(`/orders/by-number/${number}`),
+  reportDeliveryIssue: (number, data) => api.post(`/orders/by-number/${number}/delivery-issue`, data),
   // Paystack: open the hosted Paystack checkout for a created order
   initiatePaystack: ({ orderId }) =>
     api.post("/orders/paystack/initiate", { orderId }),
@@ -148,6 +149,8 @@ export const adminAPI = {
   // Orders
   getOrders: (params) => api.get("/admin/orders", { params }),
   updateOrder: (id, data) => api.put(`/admin/orders/${id}`, data),
+  issueDeliveryCode: (id) => api.post(`/admin/orders/${id}/delivery-code`),
+  verifyDelivery: (id, code) => api.post(`/admin/orders/${id}/verify-delivery`, { code }),
   // Customers
   getCustomers: (params) => api.get("/admin/customers", { params }),
   // Reviews

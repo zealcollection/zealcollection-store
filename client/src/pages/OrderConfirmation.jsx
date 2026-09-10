@@ -16,6 +16,11 @@ export default function OrderConfirmation() {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [issueEmail, setIssueEmail] = useState("");
+  const [issueReason, setIssueReason] = useState("Item not received");
+  const [issueMessage, setIssueMessage] = useState("");
+  const [issueSubmitting, setIssueSubmitting] = useState(false);
+  const [issueSent, setIssueSent] = useState(false);
 
   // ------------------------------------------------------------------
   // PAYSTACK VERIFY-ON-RETURN
@@ -73,6 +78,25 @@ export default function OrderConfirmation() {
     } catch (err) {
       setRedirecting(false);
       toast.error(err.message || "Could not open the payment page");
+    }
+  };
+
+  const reportDeliveryIssue = async (event) => {
+    event.preventDefault();
+    if (!order?.orderNumber) return;
+    try {
+      setIssueSubmitting(true);
+      await ordersAPI.reportDeliveryIssue(order.orderNumber, {
+        email: issueEmail,
+        reason: issueReason,
+        message: issueMessage,
+      });
+      setIssueSent(true);
+      toast.success("Delivery issue submitted");
+    } catch (err) {
+      toast.error(err.message || "Could not submit delivery issue");
+    } finally {
+      setIssueSubmitting(false);
     }
   };
 
@@ -245,6 +269,54 @@ export default function OrderConfirmation() {
                 </div>
               </>
             ) : null}
+          </motion.div>
+        )}
+
+        {order && order.orderStatus === "delivered" && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="max-w-xl mx-auto border border-mist p-6 mt-6 text-left"
+          >
+            <p className="font-display text-lg mb-2">Delivery problem?</p>
+            {issueSent ? (
+              <p className="text-sm text-onyx/60">Your report was submitted. Our team will review it and contact you.</p>
+            ) : (
+              <form onSubmit={reportDeliveryIssue} className="space-y-3">
+                <p className="text-sm text-onyx/60">If you did not receive this order, tell us using the email used at checkout.</p>
+                <input
+                  type="email"
+                  required
+                  value={issueEmail}
+                  onChange={(event) => setIssueEmail(event.target.value)}
+                  placeholder="Email used at checkout"
+                  className="w-full border border-onyx/20 px-3 py-2.5 text-sm focus:outline-none focus:border-gold"
+                />
+                <select
+                  value={issueReason}
+                  onChange={(event) => setIssueReason(event.target.value)}
+                  className="w-full border border-onyx/20 px-3 py-2.5 text-sm focus:outline-none focus:border-gold"
+                >
+                  <option>Item not received</option>
+                  <option>Wrong item received</option>
+                  <option>Package damaged</option>
+                  <option>Item missing from package</option>
+                </select>
+                <textarea
+                  required
+                  minLength={10}
+                  value={issueMessage}
+                  onChange={(event) => setIssueMessage(event.target.value)}
+                  placeholder="Describe the problem"
+                  rows={4}
+                  className="w-full border border-onyx/20 px-3 py-2.5 text-sm focus:outline-none focus:border-gold"
+                />
+                <button type="submit" disabled={issueSubmitting} className="btn-luxury-outline disabled:opacity-60">
+                  {issueSubmitting ? "Submitting..." : "Report delivery problem"}
+                </button>
+              </form>
+            )}
           </motion.div>
         )}
 

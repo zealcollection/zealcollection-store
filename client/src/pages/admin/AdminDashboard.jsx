@@ -1139,9 +1139,10 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
 // Orders tab
 // ------------------------------------------------------------------
 function OrdersTab({ orders, refresh, filters, setFilters }) {
-  const orderStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+  const orderStatuses = ["pending", "processing", "shipped", "out_for_delivery", "delivered", "cancelled"];
   const paymentStatuses = ["pending", "paid", "failed", "refunded"];
-  const statusLabel = (value) => String(value || "pending").replace(/^./, (letter) => letter.toUpperCase());
+  const [deliveryCodes, setDeliveryCodes] = useState({});
+  const statusLabel = (value) => String(value || "pending").replace(/_/g, " ").replace(/^./, (letter) => letter.toUpperCase());
   const statusClass = (value, type) => {
     if (type === "payment") {
       return value === "paid"
@@ -1163,6 +1164,27 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
       refresh();
     } catch (err) {
       toast.error(err.message);
+    }
+  };
+
+  const issueDeliveryCode = async (id) => {
+    try {
+      const response = await adminAPI.issueDeliveryCode(id);
+      toast.success(response.data?.message || "Delivery code issued");
+      refresh();
+    } catch (err) {
+      toast.error(err.message || "Could not issue delivery code");
+    }
+  };
+
+  const verifyDelivery = async (id) => {
+    try {
+      await adminAPI.verifyDelivery(id, deliveryCodes[id] || "");
+      setDeliveryCodes((current) => ({ ...current, [id]: "" }));
+      toast.success("Delivery verified");
+      refresh();
+    } catch (err) {
+      toast.error(err.message || "Could not verify delivery");
     }
   };
 
@@ -1216,6 +1238,12 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                   <p className="text-[11px] text-onyx/50 mt-0.5">
                     {order.user?.name || "Guest"} - {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}
                   </p>
+                  {order.deliveryIssues?.length > 0 && order.deliveryIssues[order.deliveryIssues.length - 1]?.status === "open" && (
+                    <div className="mt-2 text-[10px] text-red-700">
+                      <p className="tracking-[0.12em] uppercase">Delivery issue reported: {order.deliveryIssues[order.deliveryIssues.length - 1].reason}</p>
+                      <p className="mt-1 text-red-700/80 max-w-md">{order.deliveryIssues[order.deliveryIssues.length - 1].message}</p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-end gap-3">
                   <label className="flex flex-col gap-1">
@@ -1241,6 +1269,40 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                   <span className="font-display text-lg ml-2">{formatPrice(order.total)}</span>
                 </div>
               </div>
+              {order.orderStatus !== "delivered" && order.orderStatus !== "cancelled" && (
+                <div className="flex flex-wrap items-end gap-3 mb-5 border border-gold/25 bg-gold/5 p-3">
+                  <div className="mr-auto">
+                    <p className="text-[10px] tracking-[0.16em] uppercase text-gold-dark">Delivery verification</p>
+                    <p className="text-[11px] text-onyx/55 mt-1">Issue a code when the parcel leaves, then verify it at handover.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => issueDeliveryCode(order._id)}
+                    className="border border-gold/60 px-3 py-2 text-[10px] tracking-[0.12em] uppercase hover:bg-gold/10"
+                  >
+                    Issue delivery code
+                  </button>
+                  {order.deliveryOtpExpiresAt && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={deliveryCodes[order._id] || ""}
+                        onChange={(event) => setDeliveryCodes((current) => ({ ...current, [order._id]: event.target.value.replace(/\D/g, "").slice(0, 6) }))}
+                        inputMode="numeric"
+                        maxLength={6}
+                        placeholder="6-digit code"
+                        className="w-28 border border-onyx/20 px-3 py-2 text-xs focus:outline-none focus:border-gold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => verifyDelivery(order._id)}
+                        className="bg-onyx text-ivory px-3 py-2 text-[10px] tracking-[0.12em] uppercase hover:bg-onyx/85"
+                      >
+                        Verify delivery
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {order.items?.map((item, index) => (
                   <div key={index} className="flex items-center gap-4 border border-mist/80 bg-mist/25 p-3 text-sm min-w-0">
