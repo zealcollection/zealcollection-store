@@ -1142,6 +1142,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
   const orderStatuses = ["pending", "processing", "shipped", "out_for_delivery", "delivered", "cancelled"];
   const paymentStatuses = ["pending", "paid", "failed", "refunded"];
   const [deliveryCodes, setDeliveryCodes] = useState({});
+  const [issuingDeliveryCode, setIssuingDeliveryCode] = useState({});
   const statusLabel = (value) => String(value || "pending").replace(/_/g, " ").replace(/^./, (letter) => letter.toUpperCase());
   const statusClass = (value, type) => {
     if (type === "payment") {
@@ -1168,12 +1169,16 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
   };
 
   const issueDeliveryCode = async (id) => {
+    if (issuingDeliveryCode[id]) return;
     try {
+      setIssuingDeliveryCode((current) => ({ ...current, [id]: true }));
       const response = await adminAPI.issueDeliveryCode(id);
       toast.success(response.data?.message || "Delivery code issued");
       refresh();
     } catch (err) {
       toast.error(err.message || "Could not issue delivery code");
+    } finally {
+      setIssuingDeliveryCode((current) => ({ ...current, [id]: false }));
     }
   };
 
@@ -1278,9 +1283,10 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                   <button
                     type="button"
                     onClick={() => issueDeliveryCode(order._id)}
+                    disabled={issuingDeliveryCode[order._id] || Boolean(order.deliveryOtpExpiresAt && new Date(order.deliveryOtpExpiresAt) > new Date())}
                     className="border border-gold/60 px-3 py-2 text-[10px] tracking-[0.12em] uppercase hover:bg-gold/10"
                   >
-                    Issue delivery code
+                    {issuingDeliveryCode[order._id] ? "Sending..." : order.deliveryOtpExpiresAt ? "Code already issued" : "Issue delivery code"}
                   </button>
                   {order.deliveryOtpExpiresAt && (
                     <div className="flex items-center gap-2">
