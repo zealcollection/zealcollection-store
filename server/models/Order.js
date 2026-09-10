@@ -86,6 +86,7 @@ const orderSchema = new mongoose.Schema(
     statusHistory: { type: [statusHistorySchema], default: [] },
     deliveryOtpHash: String,
     deliveryOtpExpiresAt: Date,
+    deliveryOtpSendingAt: Date,
     deliveryOtpVerifiedAt: Date,
     deliveryVerifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     deliveredAt: Date,

@@ -277,16 +277,46 @@ router.post("/orders/:id/delivery-code", async (req, res) => {
     if (!recipient) {
       return res.status(400).json({ message: "A customer email is required before issuing a delivery code" });
     }
+    if (order.deliveryOtpHash && order.deliveryOtpExpiresAt > new Date()) {
+      return res.status(409).json({ message: "A delivery code has already been issued and is still valid" });
+    }
+    if (order.deliveryOtpSendingAt && Date.now() - new Date(order.deliveryOtpSendingAt).getTime() < 30000) {
+      return res.status(409).json({ message: "A delivery code is already being sent. Please wait." });
+    }
+
+    const lockTime = new Date();
+    const lockedOrder = await Order.findOneAndUpdate(
+      {
+        _id: order._id,
+        $or: [
+          { deliveryOtpSendingAt: { $exists: false } },
+          { deliveryOtpSendingAt: null },
+          { deliveryOtpSendingAt: { $lt: new Date(Date.now() - 30000) } },
+        ],
+      },
+      { $set: { deliveryOtpSendingAt: lockTime } },
+      { new: true }
+    );
+    if (!lockedOrder) {
+      return res.status(409).json({ message: "A delivery code is already being sent. Please wait." });
+    }
+
     const otp = String(crypto.randomInt(100000, 1000000));
     // Send first. If SMTP fails, the order remains unchanged and the admin
     // receives a truthful error instead of an unusable delivery state.
-    await sendDeliveryOtp(order, recipient, otp);
-    order.deliveryOtpHash = crypto.createHash("sha256").update(otp).digest("hex");
-    order.deliveryOtpExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    order.orderStatus = "out_for_delivery";
-    order.statusHistory.push({ status: "out_for_delivery", changedBy: req.user._id, note: "Delivery code issued" });
-    await order.save({ validateBeforeSave: false });
-    const responseOrder = order.toObject();
+    try {
+      await sendDeliveryOtp(lockedOrder, recipient, otp);
+    } catch (emailError) {
+      await Order.updateOne({ _id: order._id }, { $unset: { deliveryOtpSendingAt: 1 } });
+      throw emailError;
+    }
+    lockedOrder.deliveryOtpHash = crypto.createHash("sha256").update(otp).digest("hex");
+    lockedOrder.deliveryOtpExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    lockedOrder.deliveryOtpSendingAt = undefined;
+    lockedOrder.orderStatus = "out_for_delivery";
+    lockedOrder.statusHistory.push({ status: "out_for_delivery", changedBy: req.user._id, note: "Delivery code issued" });
+    await lockedOrder.save({ validateBeforeSave: false });
+    const responseOrder = lockedOrder.toObject();
     delete responseOrder.deliveryOtpHash;
     res.json({
       order: responseOrder,
