@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 
 const getTransporter = () => {
   // If SMTP is not configured, log emails to console instead of failing
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return null;
   }
   return nodemailer.createTransport({
@@ -19,8 +19,9 @@ const getTransporter = () => {
 const sendEmail = async ({ to, subject, html }) => {
   const transporter = getTransporter();
   if (!transporter) {
-    console.log(`[Email - SMTP not configured] To: ${to} | Subject: ${subject}`);
-    return;
+    const error = new Error("Email service is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
+    error.code = "SMTP_NOT_CONFIGURED";
+    throw error;
   }
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || process.env.SMTP_USER,
@@ -28,6 +29,7 @@ const sendEmail = async ({ to, subject, html }) => {
     subject,
     html,
   });
+  return true;
 };
 
 const sendOrderConfirmation = async (order, userEmail) => {

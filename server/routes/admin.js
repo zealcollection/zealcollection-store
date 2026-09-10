@@ -278,13 +278,14 @@ router.post("/orders/:id/delivery-code", async (req, res) => {
       return res.status(400).json({ message: "A customer email is required before issuing a delivery code" });
     }
     const otp = String(crypto.randomInt(100000, 1000000));
+    // Send first. If SMTP fails, the order remains unchanged and the admin
+    // receives a truthful error instead of an unusable delivery state.
+    await sendDeliveryOtp(order, recipient, otp);
     order.deliveryOtpHash = crypto.createHash("sha256").update(otp).digest("hex");
     order.deliveryOtpExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     order.orderStatus = "out_for_delivery";
     order.statusHistory.push({ status: "out_for_delivery", changedBy: req.user._id, note: "Delivery code issued" });
     await order.save({ validateBeforeSave: false });
-
-    await sendDeliveryOtp(order, recipient, otp);
     const responseOrder = order.toObject();
     delete responseOrder.deliveryOtpHash;
     res.json({
