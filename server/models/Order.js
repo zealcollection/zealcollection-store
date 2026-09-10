@@ -34,6 +34,28 @@ const shippingSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const statusHistorySchema = new mongoose.Schema(
+  {
+    status: { type: String, required: true },
+    changedAt: { type: Date, default: Date.now },
+    changedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    verificationMethod: String,
+    note: String,
+  },
+  { _id: false }
+);
+
+const deliveryIssueSchema = new mongoose.Schema(
+  {
+    status: { type: String, enum: ["open", "investigating", "resolved"], default: "open" },
+    reason: { type: String, required: true },
+    message: { type: String, required: true, maxlength: 3000 },
+    email: { type: String, required: true, lowercase: true, trim: true },
+    reportedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const orderSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -58,9 +80,16 @@ const orderSchema = new mongoose.Schema(
     paymentReference: String,
     orderStatus: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+      enum: ["pending", "processing", "shipped", "out_for_delivery", "delivered", "cancelled"],
       default: "pending",
     },
+    statusHistory: { type: [statusHistorySchema], default: [] },
+    deliveryOtpHash: String,
+    deliveryOtpExpiresAt: Date,
+    deliveryOtpVerifiedAt: Date,
+    deliveryVerifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    deliveredAt: Date,
+    deliveryIssues: { type: [deliveryIssueSchema], default: [] },
     notes: String,
   },
   { timestamps: true }
@@ -77,6 +106,15 @@ orderSchema.pre("save", function (next) {
       .slice(0, 16)
       .toUpperCase() || "GUEST";
     this.orderNumber = `ZC-${year}-${firstName}-${uuidv4().slice(0, 8).toUpperCase()}`;
+  }
+  if (!Array.isArray(this.statusHistory)) this.statusHistory = [];
+  if (this.isNew && this.statusHistory.length === 0) {
+    this.statusHistory.push({ status: this.orderStatus || "pending" });
+  } else if (this.isModified("orderStatus")) {
+    const last = this.statusHistory[this.statusHistory.length - 1];
+    if (!last || last.status !== this.orderStatus) {
+      this.statusHistory.push({ status: this.orderStatus || "pending" });
+    }
   }
   next();
 });

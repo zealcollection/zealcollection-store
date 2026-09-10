@@ -70,6 +70,25 @@ const sendOrderConfirmation = async (order, userEmail) => {
   });
 };
 
+const sendDeliveryOtp = async (order, userEmail, otp) => {
+  const firstName = String(order.shipping?.name || "Customer")
+    .trim()
+    .split(/\s+/)[0] || "Customer";
+  await sendEmail({
+    to: userEmail,
+    subject: `${firstName}, your Zealc.ollection delivery code`,
+    html: `
+      <div style="font-family:Georgia,serif;max-width:600px;margin:0 auto;color:#1a1a1a;">
+        <h1 style="letter-spacing:0.3em;font-size:24px;text-align:center;margin-bottom:24px;">Zealc.ollection</h1>
+        <p>Hello ${firstName}, your order <strong>${order.orderNumber}</strong> is out for delivery.</p>
+        <p style="margin:28px 0;text-align:center;font-size:34px;letter-spacing:0.35em;"><strong>${otp}</strong></p>
+        <p style="color:#555;">Give this six-digit code to the delivery person when you receive your package. It expires in 24 hours.</p>
+        <p style="color:#888;font-size:12px;">Do not share this code before you have received your order.</p>
+      </div>
+    `,
+  });
+};
+
 const sendPasswordReset = async (userEmail, resetUrl) => {
   await sendEmail({
     to: userEmail,
@@ -85,4 +104,4 @@ const sendPasswordReset = async (userEmail, resetUrl) => {
   });
 };
 
-module.exports = { sendEmail, sendOrderConfirmation, sendPasswordReset };
+module.exports = { sendEmail, sendOrderConfirmation, sendDeliveryOtp, sendPasswordReset };

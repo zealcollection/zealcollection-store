@@ -470,6 +470,33 @@ router.get("/by-number/:number", async (req, res) => {
   }
 });
 
+router.post("/by-number/:number/delivery-issue", async (req, res) => {
+  try {
+    const { email, reason, message } = req.body || {};
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail || !reason || !String(message || "").trim()) {
+      return res.status(400).json({ message: "Email, reason, and message are required" });
+    }
+    const order = await Order.findOne({ orderNumber: req.params.number });
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (String(order.shipping?.email || "").trim().toLowerCase() !== normalizedEmail) {
+      return res.status(403).json({ message: "The email does not match this order" });
+    }
+    order.deliveryIssues.push({
+      status: "open",
+      reason: String(reason).slice(0, 120),
+      message: String(message).trim().slice(0, 3000),
+      email: normalizedEmail,
+      reportedAt: new Date(),
+    });
+    await order.save({ validateBeforeSave: false });
+    res.json({ message: "Your delivery issue has been submitted" });
+  } catch (error) {
+    console.error("[Delivery] Failed to record issue:", error);
+    res.status(500).json({ message: "Failed to submit delivery issue" });
+  }
+});
+
 // ------------------------------------------------------------------
 // STRIPE: Create a Checkout Session
 // ------------------------------------------------------------------
