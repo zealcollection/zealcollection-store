@@ -1,11 +1,29 @@
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { SiWhatsapp } from "react-icons/si";
 
-const WHATSAPP_NUMBER = "254718690768";
+const WHATSAPP_NUMBER = "254740320749";
 const MESSAGE = "Hello Zealc.ollection, I'm interested in one of your pieces.";
 
 export default function WhatsAppButton() {
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(MESSAGE)}`;
+  const location = useLocation();
+  let productMessage = MESSAGE;
+
+  // ProductDetails stores only the currently viewed product in sessionStorage.
+  // The button stays generic everywhere else, so an old product can never be
+  // attached to a WhatsApp inquiry from a different page.
+  if (location.pathname.startsWith("/product/")) {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("whatsappProduct") || "null");
+      if (saved?.name) {
+        productMessage = `Hello Zealc.ollection, I'm interested in ${saved.name}.${saved.image ? `\nProduct image: ${saved.image}` : ""}`;
+      }
+    } catch {
+      // Keep the generic message if sessionStorage is unavailable or corrupt.
+    }
+  }
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(productMessage)}`;
 
   return (
     <motion.a

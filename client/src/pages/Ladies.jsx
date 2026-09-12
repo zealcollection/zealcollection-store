@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 import SEO from "../components/SEO";
-import { imgHero } from "../lib/imageOpt";
+import { imgHero, videoSrc } from "../lib/imageOpt";
 import ProductCard from "../components/ProductCard";
 import { productsAPI, categoriesAPI } from "../lib/api";
 import { DEMO_PRODUCTS, DEMO_CATEGORIES } from "../data/demoData";
@@ -124,13 +124,14 @@ export default function Ladies() {
           )}
           {HERO_VIDEO_URL && (
             <video
-              src={HERO_VIDEO_URL}
+              src={videoSrc(HERO_VIDEO_URL, 1280)}
               autoPlay
               muted
               loop
               playsInline
+              preload="metadata"
               aria-hidden="true"
-              className="edit-hero__media absolute inset-0 w-full h-full object-cover"
+              className="edit-hero__media absolute inset-0 w-full h-full object-cover object-center"
             />
           )}
           {/* Dark scrim so text stays crisp over any media */}

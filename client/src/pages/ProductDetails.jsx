@@ -18,7 +18,7 @@ import ProductCard, { formatPrice } from "../components/ProductCard";
 import { productsAPI, reviewsAPI, wishlistAPI } from "../lib/api";
 import { useApp } from "../context/AppContext";
 import { DEMO_PRODUCTS } from "../data/demoData";
-import { imgSrc, imgDetail, OptimisedImg } from "../lib/imageOpt";
+import { imgSrc, imgDetail, OptimisedImg, resolveImageUrl } from "../lib/imageOpt";
 
 export default function ProductDetails() {
   const { slugOrId } = useParams();
@@ -177,6 +177,18 @@ export default function ProductDetails() {
       photoUrl: url,
     };
   }, [product, colorImage, images, selectedImage]);
+
+  useEffect(() => {
+    if (!product || !displayImage) return;
+    try {
+      sessionStorage.setItem("whatsappProduct", JSON.stringify({
+        name: product.name,
+        image: resolveImageUrl(displayImage),
+      }));
+    } catch {
+      // WhatsApp remains available with the generic message if storage is blocked.
+    }
+  }, [product, displayImage]);
 
   const handleAddToCart = () => {
     if (!product) return;

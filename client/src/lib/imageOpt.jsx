@@ -36,6 +36,18 @@ export function resolveImageUrl(url) {
   return value;
 }
 
+// Deliver hero videos in an adaptive, browser-friendly format instead of
+// downloading the original high-resolution MP4.
+export function videoSrc(url, width = 1280) {
+  const value = String(url || "").trim();
+  if (!value || !value.includes("res.cloudinary.com") || !value.includes("/video/upload/")) return value;
+  if (/\/(?:f_auto|q_auto|vc_auto|w_\d+)(?:,|\/)/.test(value)) return value;
+  return value.replace(
+    "/video/upload/",
+    `/video/upload/f_auto,q_auto:eco,vc_auto,w_${width}/`
+  );
+}
+
 export function isCloudinaryUrl(url) {
   return typeof url === "string" && url.trim().startsWith("http") && url.includes(CLOUDINARY_HOST);
 }

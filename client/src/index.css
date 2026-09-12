@@ -146,6 +146,20 @@
   animation: zoFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Keep Men/Ladies hero media flush with the hero box while preserving the
+   composition on narrow screens. The video is cropped intentionally rather
+   than stretched, so faces and products are never distorted. */
+.edit-hero {
+  min-height: clamp(560px, 78svh, 900px);
+  isolation: isolate;
+}
+.edit-hero__media {
+  object-fit: cover;
+  object-position: center center;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* Mobile composition for editorial media. Desktop sizing remains untouched. */
 @media (max-width: 767px) {
   .homepage-hero {
