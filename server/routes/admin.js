@@ -324,7 +324,24 @@ router.post("/orders/:id/delivery-code", async (req, res) => {
     });
   } catch (error) {
     console.error("[Delivery] Failed to issue code:", error);
-    res.status(500).json({ message: "Failed to issue delivery code" });
+    if (error.code === "SMTP_NOT_CONFIGURED") {
+      return res.status(503).json({
+        message: "Email service is not configured. Add SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM in Render.",
+      });
+    }
+    if (["EAUTH", "EENVELOPE"].includes(error.code) || error.responseCode === 535) {
+      return res.status(502).json({
+        message: "Email provider rejected the SMTP login or sender. Check SMTP_USER, SMTP_PASS, and EMAIL_FROM in Render.",
+      });
+    }
+    if (["ETIMEDOUT", "ECONNECTION", "ESOCKET", "ECONNREFUSED"].includes(error.code)) {
+      return res.status(504).json({
+        message: "Email provider connection timed out. Check SMTP_HOST and SMTP_PORT in Render.",
+      });
+    }
+    res.status(502).json({
+      message: "Email provider could not send the delivery code. Check the backend Render logs for the SMTP error.",
+    });
   }
 });
 
