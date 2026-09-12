@@ -136,7 +136,7 @@ export default function ProductCard({ product, index = 0 }) {
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.9, delay: index * 0.14, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay: Math.min(index * 0.035, 0.18), ease: [0.22, 1, 0.36, 1] }}
       className="group"
     >
       <Link to={`/product/${product.slug || product._id}`} className="block">

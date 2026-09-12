@@ -15,6 +15,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import OrderLookup from "./pages/OrderLookup";
 import Wishlist from "./pages/Wishlist";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -123,6 +124,14 @@ const router = createBrowserRouter([
     element: (
       <Layout>
         <OrderConfirmation />
+      </Layout>
+    ),
+  },
+  {
+    path: "/track-order",
+    element: (
+      <Layout>
+        <OrderLookup />
       </Layout>
     ),
   },

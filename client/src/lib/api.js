@@ -3,7 +3,10 @@ import axios from "axios";
 // Render environment variables are often entered as the backend origin
 // without /api. Normalizing here prevents requests such as /products and
 // /auth/login from bypassing the Express route prefix in production.
-const configuredBaseUrl = String(import.meta.env.VITE_API_BASE_URL || "/api").trim();
+const configuredBaseUrl = String(
+  import.meta.env.VITE_API_BASE_URL ||
+    (import.meta.env.PROD ? "https://zealcollection-store.onrender.com/api" : "/api")
+).trim();
 const API_BASE_URL =
   configuredBaseUrl === "/api" || configuredBaseUrl.endsWith("/api")
     ? configuredBaseUrl.replace(/\/+$/, "")
@@ -80,6 +83,7 @@ export const categoriesAPI = {
 export const ordersAPI = {
   create: (data) => api.post("/orders", data),
   getMyOrders: () => api.get("/orders/me"),
+  lookup: (data) => api.post("/orders/lookup", data),
   getById: (id) => api.get(`/orders/${id}`),
   getByNumber: (number) => api.get(`/orders/by-number/${number}`),
   reportDeliveryIssue: (number, data) => api.post(`/orders/by-number/${number}/delivery-issue`, data),
@@ -148,6 +152,7 @@ export const adminAPI = {
   deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
   // Orders
   getOrders: (params) => api.get("/admin/orders", { params }),
+  deleteOrder: (id) => api.delete(`/admin/orders/${id}`),
   updateOrder: (id, data) => api.put(`/admin/orders/${id}`, data),
   issueDeliveryCode: (id) => api.post(`/admin/orders/${id}/delivery-code`),
   verifyDelivery: (id, code) => api.post(`/admin/orders/${id}/verify-delivery`, { code }),

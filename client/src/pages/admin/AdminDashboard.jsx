@@ -1193,6 +1193,17 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
     }
   };
 
+  const deleteOrder = async (order) => {
+    if (!window.confirm(`Delete order ${order.orderNumber || order._id}? This cannot be undone.`)) return;
+    try {
+      await adminAPI.deleteOrder(order._id);
+      toast.success("Order history deleted");
+      refresh();
+    } catch (err) {
+      toast.error(err.message || "Could not delete order history");
+    }
+  };
+
   const filtered = orders.filter((order) => {
     if (filters.status && order.orderStatus !== filters.status) return false;
     if (filters.payment && order.paymentStatus !== filters.payment) return false;
@@ -1272,6 +1283,34 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                     </select>
                   </label>
                   <span className="font-display text-lg ml-2">{formatPrice(order.total)}</span>
+                  <button
+                    type="button"
+                    onClick={() => deleteOrder(order)}
+                    title="Delete order history"
+                    className="border border-red-200 text-red-700 p-2 hover:bg-red-50"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5 border border-mist/80 bg-mist/20 p-4 text-xs">
+                <div>
+                  <p className="text-[9px] tracking-[0.16em] uppercase text-onyx/45 mb-1">Customer</p>
+                  <p className="font-medium">{order.shipping?.name || order.user?.name || "Guest"}</p>
+                  <p className="text-onyx/60">{order.shipping?.email || order.user?.email || "No email provided"}</p>
+                  <p className="text-onyx/60">{order.shipping?.phone || "No phone provided"}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] tracking-[0.16em] uppercase text-onyx/45 mb-1">Delivery address</p>
+                  <p>{order.shipping?.street || "-"}</p>
+                  <p>{[order.shipping?.city, order.shipping?.state].filter(Boolean).join(", ") || "-"}</p>
+                  <p>{[order.shipping?.zipCode, order.shipping?.country].filter(Boolean).join(", ") || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] tracking-[0.16em] uppercase text-onyx/45 mb-1">Checkout</p>
+                  <p>Payment: <span className="capitalize">{order.paymentMethod || "-"}</span></p>
+                  <p>Shipping: <span className="capitalize">{order.shippingMethod || "standard"}</span></p>
+                  <p>Reference: {order.paymentReference || "Not assigned"}</p>
                 </div>
               </div>
               {order.orderStatus !== "delivered" && order.orderStatus !== "cancelled" && (

@@ -21,6 +21,21 @@ import { useState, useRef, useEffect } from "react";
 
 const CLOUDINARY_HOST = "res.cloudinary.com";
 
+const configuredApiUrl = String(
+  import.meta.env.VITE_API_BASE_URL ||
+    (import.meta.env.PROD ? "https://zealcollection-store.onrender.com/api" : "/api")
+).trim();
+const API_ORIGIN = configuredApiUrl.startsWith("http")
+  ? configuredApiUrl.replace(/\/api\/?$/, "").replace(/\/$/, "")
+  : "";
+
+export function resolveImageUrl(url) {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  if (value.startsWith("/uploads/") && API_ORIGIN) return `${API_ORIGIN}${value}`;
+  return value;
+}
+
 export function isCloudinaryUrl(url) {
   return typeof url === "string" && url.trim().startsWith("http") && url.includes(CLOUDINARY_HOST);
 }
@@ -79,7 +94,8 @@ export const IMG_QUALITY_DETAIL = 90;
  * @param {number} [quality] optional quality override (default 85)
  */
 export function imgSrc(url, size = IMG_SIZES.card, quality = IMG_QUALITY) {
-  if (!isCloudinaryUrl(url)) return url || "";
+  const resolvedUrl = resolveImageUrl(url);
+  if (!isCloudinaryUrl(resolvedUrl)) return resolvedUrl;
   // Multiply by device pixel ratio (min 2 for retina) so retina screens
   // get a source at least 2x the display size -> sharp thumbnails.
   let targetWidth = Math.round(size * Math.max(2, window.devicePixelRatio || 1));
@@ -91,7 +107,7 @@ export function imgSrc(url, size = IMG_SIZES.card, quality = IMG_QUALITY) {
   // Ask Cloudinary to crop to the exact slot proportions too (avoids
   // shipping a taller file than the slot can ever show) while keeping
   // every pixel of the subject visible.
-  return buildCloudinaryUrl(url, targetWidth, quality, true);
+  return buildCloudinaryUrl(resolvedUrl, targetWidth, quality, true);
 }
 
 /** Crisp URL for small slots (cart thumbnails, admin tiles). */
@@ -171,8 +187,12 @@ export function OptimisedImg({ src, alt, className = "", fill = false, ...rest }
       src={src}
       alt={alt}
       loading="lazy"
-      onError={handleImgError}
+      onError={(event) => {
+        handleImgError(event);
+        setLoaded(true);
+      }}
       onLoad={() => setLoaded(true)}
+      decoding="async"
       {...rest}
       className={`${className} ${!loaded ? "opacity-0" : ""}`.trim()}
     />

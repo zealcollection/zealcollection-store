@@ -36,17 +36,8 @@ const drawerLinks = [
   { label: "Blog", path: "/blog" },
   { label: "About", path: "/about" },
   { label: "Contact", path: "/contact" },
+  { label: "Track Order", path: "/track-order" },
 ];
-
-// ------------------------------------------------------------------
-// Routes that open straight into a plain, light-background section
-// instead of a full-bleed dark hero image. On those pages the header
-// needs to start in its "solid" (light background + dark text) state
-// right away - otherwise the ivory/white nav links are invisible
-// against the page until the user scrolls past the 60px threshold.
-// Add any other hero-less route paths here as you create them.
-// ------------------------------------------------------------------
-const NO_HERO_ROUTES = ["/contact", "/faq"];
 
 export default function Navbar() {
   const { cartTotals, wishlistState, isAuthenticated, auth, logout } = useApp();
@@ -93,8 +84,7 @@ export default function Navbar() {
     };
   }, []);
 
-  // True on routes that don't have a dark hero banner to sit over.
-  const hasNoHero = NO_HERO_ROUTES.includes(location.pathname);
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
     let ticking = false;
@@ -138,9 +128,7 @@ export default function Navbar() {
     setSearchInput("");
   };
 
-  // Solid (light background + dark text) once scrolled, OR immediately
-  // on routes with no dark hero to sit over.
-  const solid = scrolled || hasNoHero;
+  const solid = scrolled;
 
   const linkClass = (path) =>
     `inline-block text-[15px] tracking-[0.15em] uppercase font-semibold transition-colors duration-300 whitespace-nowrap ${
@@ -396,6 +384,18 @@ export default function Navbar() {
                 }`}
               >
                 Contact
+              </Link>
+              <Link
+                to="/track-order"
+                className={`hidden xl:inline-block text-[13px] tracking-[0.12em] uppercase font-semibold transition-colors ${
+                  location.pathname === "/track-order"
+                    ? "text-gold-dark"
+                    : solid
+                    ? "text-onyx hover:text-gold-dark"
+                    : "text-ivory hover:text-gold"
+                }`}
+              >
+                Track Order
               </Link>
 
               <button
