@@ -1,38 +1,36 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const getTransporter = () => {
-  // If SMTP is not configured, log emails to console instead of failing
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    return null;
-  }
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: Number(process.env.SMTP_PORT) === 465,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-};
+// Resend's HTTP API is used instead of SMTP because Render's free tier
+// blocks outbound SMTP ports (25/465/587) at the network level, which
+// causes ETIMEDOUT regardless of which SMTP provider is configured.
+// The HTTP API only needs outbound HTTPS (port 443), which is never blocked.
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const sendEmail = async ({ to, subject, html }) => {
-  const transporter = getTransporter();
-  if (!transporter) {
-    const error = new Error("Email service is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM.");
+  if (!resend) {
+    const error = new Error(
+      "Email service is not configured. Set RESEND_API_KEY and EMAIL_FROM."
+    );
     error.code = "SMTP_NOT_CONFIGURED";
     throw error;
   }
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+
+  const { data, error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM,
     to,
     subject,
     html,
   });
-  return true;
+
+  if (error) {
+    const err = new Error(error.message || "Resend API error");
+    // Preserve a recognizable code so existing route error-handling
+    // (e.g. EENVELOPE/EAUTH branches in admin.js) still applies sensibly.
+    err.code = error.name === "validation_error" ? "EENVELOPE" : "EMAIL_PROVIDER_ERROR";
+    throw err;
+  }
+
+  return data;
 };
 
 const sendOrderConfirmation = async (order, userEmail) => {
