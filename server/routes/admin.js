@@ -263,6 +263,17 @@ router.get("/orders", async (req, res) => {
   }
 });
 
+router.delete("/orders/:id", async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    res.json({ message: "Order history deleted", orderId: order._id });
+  } catch (error) {
+    console.error("[Admin] Failed to delete order:", error);
+    res.status(500).json({ message: "Failed to delete order history" });
+  }
+});
+
 router.post("/orders/:id/delivery-code", async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);

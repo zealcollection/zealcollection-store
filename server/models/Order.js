@@ -62,6 +62,7 @@ const orderSchema = new mongoose.Schema(
     orderNumber: { type: String, unique: true },
     items: [orderItemSchema],
     shipping: { type: shippingSchema, required: true },
+    shippingMethod: { type: String, enum: ["standard", "express", "cod"], default: "standard" },
     subtotal: { type: Number, required: true, min: 0 },
     shippingCost: { type: Number, required: true, default: 0, min: 0 },
     discount: { type: Number, required: true, default: 0, min: 0 },

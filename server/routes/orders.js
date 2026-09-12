@@ -170,6 +170,7 @@ router.post("/", optionalAuth, async (req, res) => {
       user: req.user ? req.user._id : undefined,
       items: resolvedItems,
       shipping: { ...shipping, email: shipping.email },
+      shippingMethod,
       subtotal,
       shippingCost,
       discount,
@@ -449,6 +450,25 @@ router.get("/:id", optionalAuth, async (req, res) => {
     res.json({ order });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch order" });
+  }
+});
+
+// Guest order tracking requires both the human-readable order number and the
+// email used at checkout. This prevents order numbers alone from exposing
+// customer addresses and order details.
+router.post("/lookup", async (req, res) => {
+  try {
+    const orderNumber = String(req.body?.orderNumber || "").trim().toUpperCase();
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    if (!orderNumber || !email) {
+      return res.status(400).json({ message: "Order number and checkout email are required" });
+    }
+    const order = await Order.findOne({ orderNumber, "shipping.email": email });
+    if (!order) return res.status(404).json({ message: "No order matches that number and email" });
+    res.json({ order });
+  } catch (error) {
+    console.error("[Orders] Guest lookup failed:", error);
+    res.status(500).json({ message: "Unable to look up order" });
   }
 });
 
