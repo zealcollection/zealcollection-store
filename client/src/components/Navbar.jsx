@@ -544,13 +544,13 @@ export default function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-24px", opacity: 0 }}
               transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 left-0 bottom-0 z-50 w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
+              className="fixed top-0 left-0 bottom-0 z-[60] w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
             >
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05, duration: 0.35 }}
-                className="flex flex-col items-center gap-4 px-7 py-6 border-b border-gold/20"
+                className="relative flex flex-col items-center gap-4 px-7 py-6 border-b border-gold/20"
               >
                 <img
                   src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
@@ -561,7 +561,7 @@ export default function Navbar() {
                   type="button"
                   aria-label="Close menu"
                   onClick={() => setDrawerOpen(false)}
-                  className="p-2 text-gold/80 hover:text-gold transition-colors self-end -mt-16"
+                  className="absolute top-5 right-5 z-10 p-2 text-gold/80 hover:text-gold transition-colors"
                 >
                   <X size={18} />
                 </button>
