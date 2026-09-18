@@ -637,6 +637,7 @@ export default function Navbar() {
                   </p>
                   <Link
                     to="/wishlist"
+                    onClick={closeDrawer}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
@@ -651,6 +652,7 @@ export default function Navbar() {
                   {isAuthenticated && auth?.user?.role === "admin" && (
                     <Link
                       to="/admin"
+                      onClick={closeDrawer}
                       className="flex items-center gap-3 py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                     >
                       <ShieldCheck size={14} className="text-gold" /> Admin Dashboard
@@ -658,6 +660,7 @@ export default function Navbar() {
                   )}
                   <Link
                     to="/cart"
+                    onClick={closeDrawer}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
