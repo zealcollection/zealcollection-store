@@ -128,13 +128,6 @@ export default function Navbar() {
     setSearchInput("");
   };
 
-  const closeDrawer = () => setDrawerOpen(false);
-  const navigateFromDrawer = (event, path) => {
-    event.preventDefault();
-    closeDrawer();
-    navigate(path);
-  };
-
   const solid = scrolled;
 
   const linkClass = (path) =>
@@ -149,7 +142,7 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[70] ${
+        className={`fixed top-0 left-0 right-0 z-50 ${
           solid
             ? "bg-ivory/85 backdrop-blur-md shadow-md"
             : "bg-transparent"
@@ -168,7 +161,6 @@ export default function Navbar() {
                 type="button"
                 aria-label="Open menu"
                 onClick={() => setDrawerOpen(true)}
-                aria-expanded={drawerOpen}
                 className={`block md:hidden p-2.5 shrink-0 transition-colors ${
                   solid ? "text-onyx" : "text-ivory"
                 }`}
@@ -543,8 +535,8 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={closeDrawer}
-              className="fixed inset-0 z-[80] bg-onyx/60 backdrop-blur-sm md:hidden"
+              onClick={() => setDrawerOpen(false)}
+              className="fixed inset-0 z-50 bg-onyx/60 backdrop-blur-sm md:hidden"
             />
             {/* Drawer */}
             <motion.aside
@@ -552,13 +544,13 @@ export default function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-24px", opacity: 0 }}
               transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 left-0 bottom-0 z-[81] w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
+              className="fixed top-0 left-0 bottom-0 z-50 w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
             >
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05, duration: 0.35 }}
-                className="relative flex flex-col items-center gap-4 px-7 py-6 border-b border-gold/20"
+                className="flex flex-col items-center gap-4 px-7 py-6 border-b border-gold/20"
               >
                 <img
                   src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
@@ -568,8 +560,8 @@ export default function Navbar() {
                 <button
                   type="button"
                   aria-label="Close menu"
-                  onClick={closeDrawer}
-                  className="absolute top-5 right-5 z-10 flex h-11 w-11 items-center justify-center p-2 text-gold/80 hover:text-gold transition-colors touch-manipulation"
+                  onClick={() => setDrawerOpen(false)}
+                  className="p-2 text-gold/80 hover:text-gold transition-colors self-end -mt-16"
                 >
                   <X size={18} />
                 </button>
@@ -590,7 +582,7 @@ export default function Navbar() {
                     >
                       <Link
                         to={link.path}
-                        onClick={(event) => navigateFromDrawer(event, link.path)}
+                        onClick={() => setDrawerOpen(false)}
                         className="block py-1.5 font-display text-[17px] text-gold/90 hover:text-gold transition-colors"
                         style={{ letterSpacing: "0.02em" }}
                       >
@@ -642,7 +634,6 @@ export default function Navbar() {
                   </p>
                   <Link
                     to="/wishlist"
-                    onClick={(event) => navigateFromDrawer(event, "/wishlist")}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
@@ -657,7 +648,6 @@ export default function Navbar() {
                   {isAuthenticated && auth?.user?.role === "admin" && (
                     <Link
                       to="/admin"
-                      onClick={(event) => navigateFromDrawer(event, "/admin")}
                       className="flex items-center gap-3 py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                     >
                       <ShieldCheck size={14} className="text-gold" /> Admin Dashboard
@@ -665,7 +655,6 @@ export default function Navbar() {
                   )}
                   <Link
                     to="/cart"
-                    onClick={(event) => navigateFromDrawer(event, "/cart")}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
@@ -693,7 +682,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[90] bg-onyx/90 flex items-start justify-center pt-32 px-4"
+            className="fixed inset-0 z-50 bg-onyx/90 flex items-start justify-center pt-32 px-4"
           >
             <motion.div
               initial={{ y: -24, opacity: 0 }}
