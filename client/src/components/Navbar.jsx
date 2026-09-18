@@ -128,6 +128,8 @@ export default function Navbar() {
     setSearchInput("");
   };
 
+  const closeDrawer = () => setDrawerOpen(false);
+
   const solid = scrolled;
 
   const linkClass = (path) =>
@@ -142,7 +144,7 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 ${
+        className={`fixed top-0 left-0 right-0 z-[70] ${
           solid
             ? "bg-ivory/85 backdrop-blur-md shadow-md"
             : "bg-transparent"
@@ -161,6 +163,7 @@ export default function Navbar() {
                 type="button"
                 aria-label="Open menu"
                 onClick={() => setDrawerOpen(true)}
+                aria-expanded={drawerOpen}
                 className={`block md:hidden p-2.5 shrink-0 transition-colors ${
                   solid ? "text-onyx" : "text-ivory"
                 }`}
@@ -535,8 +538,8 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setDrawerOpen(false)}
-              className="fixed inset-0 z-50 bg-onyx/60 backdrop-blur-sm md:hidden"
+              onClick={closeDrawer}
+              className="fixed inset-0 z-[80] bg-onyx/60 backdrop-blur-sm md:hidden"
             />
             {/* Drawer */}
             <motion.aside
@@ -544,7 +547,7 @@ export default function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-24px", opacity: 0 }}
               transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 left-0 bottom-0 z-[60] w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
+              className="fixed top-0 left-0 bottom-0 z-[81] w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
             >
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
@@ -560,8 +563,8 @@ export default function Navbar() {
                 <button
                   type="button"
                   aria-label="Close menu"
-                  onClick={() => setDrawerOpen(false)}
-                  className="absolute top-5 right-5 z-10 p-2 text-gold/80 hover:text-gold transition-colors"
+                  onClick={closeDrawer}
+                  className="absolute top-5 right-5 z-10 flex h-11 w-11 items-center justify-center p-2 text-gold/80 hover:text-gold transition-colors touch-manipulation"
                 >
                   <X size={18} />
                 </button>
@@ -682,7 +685,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-onyx/90 flex items-start justify-center pt-32 px-4"
+            className="fixed inset-0 z-[90] bg-onyx/90 flex items-start justify-center pt-32 px-4"
           >
             <motion.div
               initial={{ y: -24, opacity: 0 }}
