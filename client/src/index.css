@@ -146,6 +146,104 @@
   animation: zoFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Admin workspace: quiet surfaces, stronger hierarchy, and a restrained
+   gold active state that echoes the storefront without competing with data. */
+.admin-page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.admin-nav {
+  border-radius: 2px;
+}
+.admin-nav-group + .admin-nav-group {
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(26, 26, 26, 0.07);
+}
+.admin-nav-label {
+  color: rgba(26, 26, 26, 0.38);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.admin-nav-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  border-left: 2px solid transparent;
+  padding: 0.72rem 0.75rem;
+  color: rgba(26, 26, 26, 0.62);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-align: left;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+.admin-nav-item:hover {
+  background: #f8f8f8;
+  color: #0f0f0f;
+}
+.admin-nav-item.is-active {
+  border-left-color: #e0b647;
+  background: #0f0f0f;
+  color: #ffffff;
+}
+.admin-card {
+  border: 1px solid rgba(26, 26, 26, 0.09);
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(26, 26, 26, 0.045);
+}
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(26, 26, 26, 0.09);
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(26, 26, 26, 0.035);
+}
+
+@media (max-width: 1023px) {
+  .admin-page-heading {
+    align-items: flex-start;
+  }
+  .admin-nav {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    padding: 0.5rem;
+  }
+  .admin-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 0 0 auto;
+  }
+  .admin-nav-group + .admin-nav-group {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .admin-nav-label {
+    display: none;
+  }
+  .admin-nav-item {
+    width: auto;
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    padding: 0.7rem 0.85rem;
+    white-space: nowrap;
+  }
+  .admin-nav-item.is-active {
+    border-bottom-color: #e0b647;
+    border-left-color: transparent;
+  }
+}
+
 /* Keep Men/Ladies hero media flush with the hero box while preserving the
    composition on narrow screens. The video is cropped intentionally rather
    than stretched, so faces and products are never distorted. */
@@ -163,7 +261,7 @@
 /* Mobile composition for editorial media. Desktop sizing remains untouched. */
 @media (max-width: 767px) {
   .homepage-hero {
-    min-height: 78svh;
+    min-height: 64svh;
   }
 
   .homepage-hero__media {

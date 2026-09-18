@@ -1,5 +1,4 @@
 const express = require("express");
-const crypto = require("crypto");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const Order = require("../models/Order");
@@ -9,7 +8,6 @@ const Coupon = require("../models/Coupon");
 const Subscriber = require("../models/Subscriber");
 const AnalyticsState = require("../models/AnalyticsState");
 const { protect, admin } = require("../middleware/auth");
-const { sendDeliveryOtp } = require("../utils/email");
 
 const router = express.Router();
 
@@ -274,135 +272,12 @@ router.delete("/orders/:id", async (req, res) => {
   }
 });
 
-router.post("/orders/:id/delivery-code", async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: "Order not found" });
-    if (order.orderStatus === "delivered" || order.orderStatus === "cancelled") {
-      return res.status(400).json({ message: "A delivery code cannot be issued for this order" });
-    }
-    if (order.paymentMethod !== "cod" && order.paymentStatus !== "paid") {
-      return res.status(400).json({ message: "Confirm online payment before issuing a delivery code" });
-    }
-    const recipient = order.shipping?.email;
-    if (!recipient) {
-      return res.status(400).json({ message: "A customer email is required before issuing a delivery code" });
-    }
-    if (order.deliveryOtpHash && order.deliveryOtpExpiresAt > new Date()) {
-      return res.status(409).json({ message: "A delivery code has already been issued and is still valid" });
-    }
-    if (order.deliveryOtpSendingAt && Date.now() - new Date(order.deliveryOtpSendingAt).getTime() < 30000) {
-      return res.status(409).json({ message: "A delivery code is already being sent. Please wait." });
-    }
-
-    const lockTime = new Date();
-    const lockedOrder = await Order.findOneAndUpdate(
-      {
-        _id: order._id,
-        $or: [
-          { deliveryOtpSendingAt: { $exists: false } },
-          { deliveryOtpSendingAt: null },
-          { deliveryOtpSendingAt: { $lt: new Date(Date.now() - 30000) } },
-        ],
-      },
-      { $set: { deliveryOtpSendingAt: lockTime } },
-      { new: true }
-    );
-    if (!lockedOrder) {
-      return res.status(409).json({ message: "A delivery code is already being sent. Please wait." });
-    }
-
-    const otp = String(crypto.randomInt(100000, 1000000));
-    // Send first. If SMTP fails, the order remains unchanged and the admin
-    // receives a truthful error instead of an unusable delivery state.
-    try {
-      await sendDeliveryOtp(lockedOrder, recipient, otp);
-    } catch (emailError) {
-      await Order.updateOne({ _id: order._id }, { $unset: { deliveryOtpSendingAt: 1 } });
-      throw emailError;
-    }
-    lockedOrder.deliveryOtpHash = crypto.createHash("sha256").update(otp).digest("hex");
-    lockedOrder.deliveryOtpExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    lockedOrder.deliveryOtpSendingAt = undefined;
-    lockedOrder.orderStatus = "out_for_delivery";
-    lockedOrder.statusHistory.push({ status: "out_for_delivery", changedBy: req.user._id, note: "Delivery code issued" });
-    await lockedOrder.save({ validateBeforeSave: false });
-    const responseOrder = lockedOrder.toObject();
-    delete responseOrder.deliveryOtpHash;
-    res.json({
-      order: responseOrder,
-      message: "Delivery code issued and sent to the customer",
-    });
-  } catch (error) {
-    console.error("[Delivery] Failed to issue code:", error);
-    if (error.code === "SMTP_NOT_CONFIGURED") {
-      return res.status(503).json({
-        message: "Email service is not configured. Add SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and EMAIL_FROM in Render.",
-      });
-    }
-    if (["EAUTH", "EENVELOPE"].includes(error.code) || error.responseCode === 535) {
-      return res.status(502).json({
-        message: "Email provider rejected the SMTP login or sender. Check SMTP_USER, SMTP_PASS, and EMAIL_FROM in Render.",
-      });
-    }
-    if (["ETIMEDOUT", "ECONNECTION", "ESOCKET", "ECONNREFUSED"].includes(error.code)) {
-      return res.status(504).json({
-        message: "Email provider connection timed out. Check SMTP_HOST and SMTP_PORT in Render.",
-      });
-    }
-    res.status(502).json({
-      message: "Email provider could not send the delivery code. Check the backend Render logs for the SMTP error.",
-    });
-  }
-});
-
-router.post("/orders/:id/verify-delivery", async (req, res) => {
-  try {
-    const { code } = req.body || {};
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: "Order not found" });
-    if (!/^\d{6}$/.test(String(code || ""))) {
-      return res.status(400).json({ message: "Enter the six-digit delivery code" });
-    }
-    if (!order.deliveryOtpHash || !order.deliveryOtpExpiresAt || order.deliveryOtpExpiresAt < new Date()) {
-      return res.status(400).json({ message: "The delivery code is missing or expired" });
-    }
-    const hash = crypto.createHash("sha256").update(String(code)).digest("hex");
-    if (hash !== order.deliveryOtpHash) {
-      return res.status(400).json({ message: "Incorrect delivery code" });
-    }
-    order.orderStatus = "delivered";
-    order.deliveryOtpHash = undefined;
-    order.deliveryOtpExpiresAt = undefined;
-    order.deliveryOtpVerifiedAt = new Date();
-    order.deliveryVerifiedBy = req.user._id;
-    order.deliveredAt = new Date();
-    order.statusHistory.push({
-      status: "delivered",
-      changedBy: req.user._id,
-      verificationMethod: "delivery_otp",
-      note: "Delivery code verified",
-    });
-    await order.save({ validateBeforeSave: false });
-    res.json({ order, message: "Delivery verified and order marked delivered" });
-  } catch (error) {
-    console.error("[Delivery] Failed to verify code:", error);
-    res.status(500).json({ message: "Failed to verify delivery" });
-  }
-});
-
 router.put("/orders/:id", async (req, res) => {
   try {
     const { orderStatus, paymentStatus } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
-    }
-    if (orderStatus === "delivered" && !order.deliveryOtpVerifiedAt) {
-      return res.status(400).json({ message: "Verify the delivery code before marking this order delivered" });
-    }
-    if (orderStatus === "out_for_delivery" && !order.deliveryOtpHash) {
-      return res.status(400).json({ message: "Issue a delivery code before marking this order out for delivery" });
     }
     if (orderStatus && orderStatus !== order.orderStatus) {
       order.orderStatus = orderStatus;

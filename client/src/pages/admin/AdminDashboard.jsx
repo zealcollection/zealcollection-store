@@ -51,15 +51,15 @@ function colorToHex(name) {
 }
 
 const TABS = [
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "products", label: "Products", icon: Package },
-  { id: "categories", label: "Categories", icon: Tag },
-  { id: "orders", label: "Orders", icon: ClipboardList },
-  { id: "customers", label: "Customers", icon: Users },
-  { id: "reviews", label: "Reviews", icon: Star },
-  { id: "coupons", label: "Coupons", icon: Ticket },
-  { id: "newsletter", label: "Newsletter", icon: Mail },
-  { id: "settings", label: "Site Settings", icon: Settings },
+  { id: "analytics", label: "Analytics", group: "Overview", icon: BarChart3 },
+  { id: "products", label: "Products", group: "Catalog", icon: Package },
+  { id: "categories", label: "Categories", group: "Catalog", icon: Tag },
+  { id: "orders", label: "Orders", group: "Commerce", icon: ClipboardList },
+  { id: "customers", label: "Customers", group: "Commerce", icon: Users },
+  { id: "reviews", label: "Reviews", group: "Marketing", icon: Star },
+  { id: "coupons", label: "Coupons", group: "Marketing", icon: Ticket },
+  { id: "newsletter", label: "Newsletter", group: "Marketing", icon: Mail },
+  { id: "settings", label: "Site Settings", group: "Configuration", icon: Settings },
 ];
 
 export default function AdminDashboard() {
@@ -143,36 +143,48 @@ export default function AdminDashboard() {
     <>
       <SEO title="Admin Dashboard" description="Zealc.ollection administration panel." />
 
-      {/* pt offsets the fixed navbar (desktop navbar is ~192px tall) so the
-          sidebar and page content are never hidden beneath it. */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-[120px] md:pt-[210px] pb-10 md:pb-14">
-        <div className="mb-10">
-          <p className="eyebrow mb-2">Administration</p>
-          <h1 className="section-heading text-3xl md:text-4xl">Dashboard</h1>
+      {/* Keep the existing navbar offset while giving the admin workspace a
+          calmer, more deliberate editorial layout. */}
+      <div className="admin-shell max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 pt-[120px] md:pt-[210px] pb-10 md:pb-14">
+        <div className="admin-page-heading mb-8 md:mb-10">
+          <div>
+            <p className="eyebrow mb-2">Administration</p>
+            <h1 className="section-heading text-3xl md:text-4xl">Dashboard</h1>
+            <p className="text-sm text-onyx/55 mt-3 max-w-xl">
+              A focused workspace for the collection, orders, and the people who shop it.
+            </p>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-[10px] tracking-[0.16em] uppercase text-onyx/45">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            Storefront connected
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
           {/* Sidebar */}
-          <aside className="lg:col-span-1">
-            <nav className="flex lg:flex-col gap-1 overflow-x-auto border-b lg:border-b-0 lg:border border-mist lg:p-3">
-              {TABS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTab(t.id)}
-                  className={`flex items-center gap-3 whitespace-nowrap px-4 py-3 text-[11px] tracking-[0.15em] uppercase transition-colors ${
-                    tab === t.id ? "bg-onyx text-ivory" : "text-onyx/70 hover:bg-mist"
-                  }`}
-                >
-                  <t.icon size={14} />
-                  {t.label}
-                </button>
+          <aside className="admin-sidebar lg:sticky lg:top-6">
+            <nav className="admin-nav border border-onyx/10 bg-ivory p-2 shadow-[0_18px_45px_rgba(26,26,26,0.05)]">
+              {Array.from(new Set(TABS.map((item) => item.group))).map((group) => (
+                <div key={group} className="admin-nav-group">
+                  <p className="admin-nav-label px-3 pt-3 pb-2">{group}</p>
+                  {TABS.filter((item) => item.group === group).map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTab(t.id)}
+                      className={`admin-nav-item ${tab === t.id ? "is-active" : ""}`}
+                    >
+                      <t.icon size={15} strokeWidth={1.7} />
+                      <span>{t.label}</span>
+                    </button>
+                  ))}
+                </div>
               ))}
             </nav>
           </aside>
 
           {/* Content */}
-          <div className="lg:col-span-4">
+          <div className="admin-content min-w-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={tab}
@@ -258,10 +270,11 @@ function AnalyticsTab({ analytics, onReset }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <h2 className="font-display text-xl">Analytics overview</h2>
-          <p className="text-[11px] text-onyx/50 mt-1">
+          <p className="eyebrow mb-2">Overview</p>
+          <h2 className="font-display text-2xl">Analytics overview</h2>
+          <p className="text-xs text-onyx/50 mt-2">
             {analytics?.resetAt
               ? `Showing activity since ${new Date(analytics.resetAt).toLocaleString()}`
               : "Showing all recorded activity"}
@@ -270,37 +283,43 @@ function AnalyticsTab({ analytics, onReset }) {
         <button
           type="button"
           onClick={onReset}
-          className="border border-onyx/20 px-4 py-2.5 text-[10px] tracking-[0.16em] uppercase hover:border-gold hover:text-gold-dark transition-colors"
+          className="border border-onyx/15 bg-ivory px-4 py-2.5 text-[10px] tracking-[0.16em] uppercase hover:border-gold hover:text-gold-dark transition-colors"
         >
           Reset analytics baseline
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         {stats.map((stat) => (
-          <div key={stat.label} className="border border-mist p-6 flex items-center gap-5">
-            <div className="w-12 h-12 flex items-center justify-center border border-gold/40 text-gold shrink-0">
-              <stat.icon size={20} />
+          <div key={stat.label} className="admin-card p-5 md:p-6 flex items-center gap-4">
+            <div className="w-11 h-11 flex items-center justify-center bg-onyx text-gold shrink-0">
+              <stat.icon size={19} strokeWidth={1.6} />
             </div>
             <div>
-              <p className="text-[10px] tracking-[0.25em] uppercase text-onyx/50">{stat.label}</p>
-              <p className="font-display text-2xl mt-1">{stat.value}</p>
+              <p className="text-[9px] tracking-[0.2em] uppercase text-onyx/45">{stat.label}</p>
+              <p className="font-display text-2xl md:text-3xl mt-1">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {analytics?.revenueByMonth?.length > 0 && (
-        <div className="border border-mist p-6">
-          <h3 className="font-display text-lg mb-5">Revenue by Month</h3>
+        <div className="admin-card p-5 md:p-6">
+          <div className="flex items-end justify-between gap-4 mb-5">
+            <div>
+              <p className="eyebrow mb-2">Performance</p>
+              <h3 className="font-display text-xl">Revenue by month</h3>
+            </div>
+            <span className="text-[10px] tracking-[0.14em] uppercase text-onyx/40">Paid orders</span>
+          </div>
           <div className="space-y-3">
             {analytics.revenueByMonth.map((row) => (
               <div key={row.month} className="flex items-center gap-4">
                 <span className="w-16 text-[11px] tracking-[0.1em] uppercase text-onyx/60">
                   {row.month}
                 </span>
-                <div className="flex-1 bg-mist h-6 relative">
+                <div className="flex-1 bg-mist h-3 relative overflow-hidden">
                   <div
-                    className="bg-gold h-full"
+                    className="bg-gold h-full transition-all duration-500"
                     style={{
                       width: `${Math.min(100, (row.revenue / (analytics.maxMonthlyRevenue || 1)) * 100)}%`,
                     }}
@@ -316,11 +335,12 @@ function AnalyticsTab({ analytics, onReset }) {
       )}
 
       {analytics?.ordersByStatus?.length > 0 && (
-        <div className="border border-mist p-6 mt-6">
-          <h3 className="font-display text-lg mb-5">Orders by Status</h3>
+        <div className="admin-card p-5 md:p-6 mt-5">
+          <p className="eyebrow mb-2">Fulfillment</p>
+          <h3 className="font-display text-xl mb-5">Orders by status</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {analytics.ordersByStatus.map((row) => (
-              <div key={row.status} className="bg-mist p-5 text-center">
+              <div key={row.status} className="bg-mist/70 border border-onyx/5 p-5 text-center">
                 <p className="font-display text-2xl">{row.count}</p>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-onyx/50 mt-1">{row.status}</p>
               </div>
@@ -1141,8 +1161,6 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
 function OrdersTab({ orders, refresh, filters, setFilters }) {
   const orderStatuses = ["pending", "processing", "shipped", "out_for_delivery", "delivered", "cancelled"];
   const paymentStatuses = ["pending", "paid", "failed", "refunded"];
-  const [deliveryCodes, setDeliveryCodes] = useState({});
-  const [issuingDeliveryCode, setIssuingDeliveryCode] = useState({});
   const statusLabel = (value) => String(value || "pending").replace(/_/g, " ").replace(/^./, (letter) => letter.toUpperCase());
   const statusClass = (value, type) => {
     if (type === "payment") {
@@ -1156,6 +1174,10 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
       : value === "cancelled"
       ? "bg-red-50 text-red-700 border-red-200"
+      : value === "shipped" || value === "out_for_delivery"
+      ? "bg-violet-50 text-violet-700 border-violet-200"
+      : value === "processing"
+      ? "bg-sky-50 text-sky-700 border-sky-200"
       : "bg-onyx/5 text-onyx/70 border-mist";
   };
   const updateStatus = async (id, key, value) => {
@@ -1165,31 +1187,6 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
       refresh();
     } catch (err) {
       toast.error(err.message);
-    }
-  };
-
-  const issueDeliveryCode = async (id) => {
-    if (issuingDeliveryCode[id]) return;
-    try {
-      setIssuingDeliveryCode((current) => ({ ...current, [id]: true }));
-      const response = await adminAPI.issueDeliveryCode(id);
-      toast.success(response.data?.message || "Delivery code issued");
-      refresh();
-    } catch (err) {
-      toast.error(err.message || "Could not issue delivery code");
-    } finally {
-      setIssuingDeliveryCode((current) => ({ ...current, [id]: false }));
-    }
-  };
-
-  const verifyDelivery = async (id) => {
-    try {
-      await adminAPI.verifyDelivery(id, deliveryCodes[id] || "");
-      setDeliveryCodes((current) => ({ ...current, [id]: "" }));
-      toast.success("Delivery verified");
-      refresh();
-    } catch (err) {
-      toast.error(err.message || "Could not verify delivery");
     }
   };
 
@@ -1212,17 +1209,18 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-end gap-3 mb-6">
         <div className="mr-auto">
-          <h2 className="font-display text-xl">Orders ({filtered.length})</h2>
-          <p className="text-[10px] tracking-[0.16em] uppercase text-onyx/45 mt-1">
+          <p className="eyebrow mb-2">Commerce</p>
+          <h2 className="font-display text-2xl">Orders <span className="text-onyx/35">({filtered.length})</span></h2>
+          <p className="text-xs text-onyx/50 mt-2">
             Fulfillment and payment are tracked separately
           </p>
         </div>
         <select
           value={filters.status || ""}
           onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value || undefined }))}
-          className="border border-mist px-3 py-2 text-xs focus:outline-none focus:border-gold"
+          className="border border-onyx/10 bg-ivory px-3 py-2 text-xs focus:outline-none focus:border-gold"
         >
           <option value="">All Order Statuses</option>
           {["pending", "processing", "shipped", "delivered", "cancelled"].map((s) => (
@@ -1232,7 +1230,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
         <select
           value={filters.payment || ""}
           onChange={(e) => setFilters((f) => ({ ...f, payment: e.target.value || undefined }))}
-          className="border border-mist px-3 py-2 text-xs focus:outline-none focus:border-gold"
+          className="border border-onyx/10 bg-ivory px-3 py-2 text-xs focus:outline-none focus:border-gold"
         >
           <option value="">All Payment Statuses</option>
           {["pending", "paid", "failed", "refunded"].map((s) => (
@@ -1246,16 +1244,16 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
       ) : (
         <div className="space-y-4">
           {filtered.map((order) => (
-            <div key={order._id} className="border border-mist bg-ivory p-5 md:p-6 shadow-[0_8px_30px_rgba(26,26,26,0.04)]">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div key={order._id} className="admin-card p-5 md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
                 <div>
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-onyx/50">Order</p>
-                  <p className="text-sm font-medium">{order.orderNumber || order._id}</p>
-                  <p className="text-[11px] text-onyx/50 mt-0.5">
+                  <p className="text-[9px] tracking-[0.2em] uppercase text-onyx/40 mb-1">Order reference</p>
+                  <p className="font-display text-lg">{order.orderNumber || order._id}</p>
+                  <p className="text-xs text-onyx/50 mt-1">
                     {order.user?.name || "Guest"} - {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}
                   </p>
                   {order.deliveryIssues?.length > 0 && order.deliveryIssues[order.deliveryIssues.length - 1]?.status === "open" && (
-                    <div className="mt-2 text-[10px] text-red-700">
+                    <div className="mt-3 border-l-2 border-red-400 pl-3 text-[10px] text-red-700">
                       <p className="tracking-[0.12em] uppercase">Delivery issue reported: {order.deliveryIssues[order.deliveryIssues.length - 1].reason}</p>
                       <p className="mt-1 text-red-700/80 max-w-md">{order.deliveryIssues[order.deliveryIssues.length - 1].message}</p>
                     </div>
@@ -1267,7 +1265,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                     <select
                       value={order.orderStatus || "pending"}
                       onChange={(e) => updateStatus(order._id, "orderStatus", e.target.value)}
-                      className={`border px-3 py-1.5 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.orderStatus, "order")}`}
+                      className={`border px-3 py-2 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.orderStatus, "order")}`}
                     >
                       {orderStatuses.map((s) => <option key={s} value={s}>{statusLabel(s)}</option>)}
                     </select>
@@ -1277,23 +1275,23 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                     <select
                       value={order.paymentStatus || "pending"}
                       onChange={(e) => updateStatus(order._id, "paymentStatus", e.target.value)}
-                      className={`border px-3 py-1.5 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.paymentStatus, "payment")}`}
+                      className={`border px-3 py-2 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.paymentStatus, "payment")}`}
                     >
                       {paymentStatuses.map((s) => <option key={s} value={s}>{statusLabel(s)}</option>)}
                     </select>
                   </label>
-                  <span className="font-display text-lg ml-2">{formatPrice(order.total)}</span>
+                  <span className="font-display text-xl ml-2">{formatPrice(order.total)}</span>
                   <button
                     type="button"
                     onClick={() => deleteOrder(order)}
                     title="Delete order history"
-                    className="border border-red-200 text-red-700 p-2 hover:bg-red-50"
+                    className="border border-red-200 text-red-700 p-2.5 hover:bg-red-50"
                   >
                     <Trash2 size={15} />
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5 border border-mist/80 bg-mist/20 p-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5 border border-onyx/10 bg-mist/45 p-4 text-xs">
                 <div>
                   <p className="text-[9px] tracking-[0.16em] uppercase text-onyx/45 mb-1">Customer</p>
                   <p className="font-medium">{order.shipping?.name || order.user?.name || "Guest"}</p>
@@ -1313,44 +1311,9 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                   <p>Reference: {order.paymentReference || "Not assigned"}</p>
                 </div>
               </div>
-              {order.orderStatus !== "delivered" && order.orderStatus !== "cancelled" && (
-                <div className="flex flex-wrap items-end gap-3 mb-5 border border-gold/25 bg-gold/5 p-3">
-                  <div className="mr-auto">
-                    <p className="text-[10px] tracking-[0.16em] uppercase text-gold-dark">Delivery verification</p>
-                    <p className="text-[11px] text-onyx/55 mt-1">Issue a code when the parcel leaves, then verify it at handover.</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => issueDeliveryCode(order._id)}
-                    disabled={issuingDeliveryCode[order._id] || Boolean(order.deliveryOtpExpiresAt && new Date(order.deliveryOtpExpiresAt) > new Date())}
-                    className="border border-gold/60 px-3 py-2 text-[10px] tracking-[0.12em] uppercase hover:bg-gold/10"
-                  >
-                    {issuingDeliveryCode[order._id] ? "Sending..." : order.deliveryOtpExpiresAt ? "Code already issued" : "Issue delivery code"}
-                  </button>
-                  {order.deliveryOtpExpiresAt && (
-                    <div className="flex items-center gap-2">
-                      <input
-                        value={deliveryCodes[order._id] || ""}
-                        onChange={(event) => setDeliveryCodes((current) => ({ ...current, [order._id]: event.target.value.replace(/\D/g, "").slice(0, 6) }))}
-                        inputMode="numeric"
-                        maxLength={6}
-                        placeholder="6-digit code"
-                        className="w-28 border border-onyx/20 px-3 py-2 text-xs focus:outline-none focus:border-gold"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => verifyDelivery(order._id)}
-                        className="bg-onyx text-ivory px-3 py-2 text-[10px] tracking-[0.12em] uppercase hover:bg-onyx/85"
-                      >
-                        Verify delivery
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                 {order.items?.map((item, index) => (
-                  <div key={index} className="flex items-center gap-4 border border-mist/80 bg-mist/25 p-3 text-sm min-w-0">
+                  <div key={index} className="flex items-center gap-4 border border-onyx/10 bg-ivory p-3 text-sm min-w-0">
                     <div className="w-16 h-20 md:w-20 md:h-24 bg-mist shrink-0 overflow-hidden">
                       {item.image ? (
                         <img

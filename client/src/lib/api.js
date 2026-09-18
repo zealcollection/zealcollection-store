@@ -154,8 +154,6 @@ export const adminAPI = {
   getOrders: (params) => api.get("/admin/orders", { params }),
   deleteOrder: (id) => api.delete(`/admin/orders/${id}`),
   updateOrder: (id, data) => api.put(`/admin/orders/${id}`, data),
-  issueDeliveryCode: (id) => api.post(`/admin/orders/${id}/delivery-code`),
-  verifyDelivery: (id, code) => api.post(`/admin/orders/${id}/verify-delivery`, { code }),
   // Customers
   getCustomers: (params) => api.get("/admin/customers", { params }),
   // Reviews

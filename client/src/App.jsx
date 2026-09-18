@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -5,30 +6,30 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AppProvider, useApp } from "./context/AppContext";
 
-import Home from "./pages/Home";
-import Shop from "./pages/Shop";
-import Men from "./pages/Men";
-import Ladies from "./pages/Ladies";
-import Unisex from "./pages/Unisex";
-import Blog from "./pages/Blog";
-import ProductDetails from "./pages/ProductDetails";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import OrderLookup from "./pages/OrderLookup";
-import Wishlist from "./pages/Wishlist";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Account from "./pages/Account";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Terms from "./pages/Terms";
-import ShippingReturns from "./pages/ShippingReturns";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+const Home = lazy(() => import("./pages/Home"));
+const Shop = lazy(() => import("./pages/Shop"));
+const Men = lazy(() => import("./pages/Men"));
+const Ladies = lazy(() => import("./pages/Ladies"));
+const Unisex = lazy(() => import("./pages/Unisex"));
+const Blog = lazy(() => import("./pages/Blog"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const OrderLookup = lazy(() => import("./pages/OrderLookup"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Account = lazy(() => import("./pages/Account"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const ShippingReturns = lazy(() => import("./pages/ShippingReturns"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 
 const router = createBrowserRouter([
   {
@@ -318,7 +319,9 @@ export default function App() {
         }}
         visibleToasts={3}
       />
-      <RouterProvider router={router} />
+      <Suspense fallback={null}>
+        <RouterProvider router={router} />
+      </Suspense>
     </AppProvider>
   );
 }
