@@ -52,14 +52,14 @@ export default function OrderLookup() {
               <span className="text-[10px] tracking-[0.16em] uppercase text-onyx/55">Order number</span>
               <div className="relative mt-2">
                 <Package size={16} className="absolute left-3 top-3.5 text-onyx/40" />
-                <input required value={orderNumber} onChange={(event) => setOrderNumber(event.target.value)} placeholder="ZC-26-FIRSTNAME-XXXXXXXX" className="w-full border border-mist pl-10 pr-3 py-3 text-sm uppercase focus:outline-none focus:border-gold" />
+                <input name="order-number" required value={orderNumber} onChange={(event) => setOrderNumber(event.target.value)} placeholder="ZC-26-FIRSTNAME-XXXXXXXX" className="w-full border border-mist pl-10 pr-3 py-3 text-sm uppercase focus:outline-none focus:border-gold" />
               </div>
             </label>
             <label className="block">
               <span className="text-[10px] tracking-[0.16em] uppercase text-onyx/55">Checkout email</span>
               <div className="relative mt-2">
                 <Mail size={16} className="absolute left-3 top-3.5 text-onyx/40" />
-                <input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="w-full border border-mist pl-10 pr-3 py-3 text-sm focus:outline-none focus:border-gold" />
+                <input name="email" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="w-full border border-mist pl-10 pr-3 py-3 text-sm focus:outline-none focus:border-gold" />
               </div>
             </label>
             <button type="submit" disabled={loading} className="btn-gold w-full disabled:opacity-60">

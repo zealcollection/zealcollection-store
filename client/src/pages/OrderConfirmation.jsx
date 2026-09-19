@@ -285,7 +285,7 @@ export default function OrderConfirmation() {
             ) : (
               <form onSubmit={reportDeliveryIssue} className="space-y-3">
                 <p className="text-sm text-onyx/60">If you did not receive this order, tell us using the email used at checkout.</p>
-                <input
+                <input name="issue-email"
                   type="email"
                   required
                   value={issueEmail}
@@ -293,7 +293,7 @@ export default function OrderConfirmation() {
                   placeholder="Email used at checkout"
                   className="w-full border border-onyx/20 px-3 py-2.5 text-sm focus:outline-none focus:border-gold"
                 />
-                <select
+                <select name="issue-reason"
                   value={issueReason}
                   onChange={(event) => setIssueReason(event.target.value)}
                   className="w-full border border-onyx/20 px-3 py-2.5 text-sm focus:outline-none focus:border-gold"
@@ -303,7 +303,7 @@ export default function OrderConfirmation() {
                   <option>Package damaged</option>
                   <option>Item missing from package</option>
                 </select>
-                <textarea
+                <textarea name="issue-message"
                   required
                   minLength={10}
                   value={issueMessage}

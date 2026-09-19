@@ -601,20 +601,20 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Product Name">
-            <input value={form.name} onChange={set("name")} className={inputCls} placeholder="Royal Chronograph" />
+            <input name="product-name" value={form.name} onChange={set("name")} className={inputCls} placeholder="Royal Chronograph" />
           </Field>
           <Field label="Slug">
-            <input value={form.slug} onChange={set("slug")} className={inputCls} placeholder="royal-chronograph" />
+            <input name="product-slug" value={form.slug} onChange={set("slug")} className={inputCls} placeholder="royal-chronograph" />
           </Field>
           <Field label="Price (KES)">
-            <input type="number" step="0.01" value={form.price} onChange={set("price")} className={inputCls} placeholder="1290" />
+            <input name="product-price" type="number" step="0.01" value={form.price} onChange={set("price")} className={inputCls} placeholder="1290" />
           </Field>
           <Field label="Stock">
-            <input type="number" value={form.stock} onChange={set("stock")} className={inputCls} placeholder="10" />
+            <input name="product-stock" type="number" value={form.stock} onChange={set("stock")} className={inputCls} placeholder="10" />
             <p className="mt-1 text-[10px] text-onyx/50">Set to 0 to mark the product as Sold Out on the storefront.</p>
           </Field>
           <Field label="Category">
-            <select value={form.category} onChange={set("category")} className={inputCls}>
+            <select name="product-category" value={form.category} onChange={set("category")} className={inputCls}>
               <option value="">Select category</option>
               {categories.map((c) => (
                 <option key={c._id} value={c._id}>{c.name}</option>
@@ -622,7 +622,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
             </select>
           </Field>
           <Field label="Audience (shopper section)">
-            <select value={form.gender} onChange={set("gender")} className={inputCls}>
+            <select name="product-gender" value={form.gender} onChange={set("gender")} className={inputCls}>
               <option value="men">Men</option>
               <option value="ladies">Ladies</option>
               <option value="unisex">Everyone (Unisex)</option>
@@ -630,10 +630,10 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
             <p className="mt-1 text-[10px] text-onyx/50">Decides whether the product appears in the Men or Ladies section of the storefront.</p>
           </Field>
           <Field label="Variants (comma separated)">
-            <input value={form.variants} onChange={set("variants")} className={inputCls} placeholder="40mm, 42mm" />
+            <input name="product-variants" value={form.variants} onChange={set("variants")} className={inputCls} placeholder="40mm, 42mm" />
           </Field>
           <Field label="Colors (comma separated)">
-            <input value={form.colors} onChange={set("colors")} className={inputCls} placeholder="Gold, Silver" />
+            <input name="product-colors" value={form.colors} onChange={set("colors")} className={inputCls} placeholder="Gold, Silver" />
             <p className="mt-1 text-[10px] text-onyx/50">Names must match exactly (e.g. Noir, Ivory, Gold) - each colour below gets its own photo.</p>
           </Field>
         </div>
@@ -680,7 +680,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
                         className="flex-1 cursor-pointer"
                         title="Upload the image for this colour"
                       >
-                        <input
+                        <input name="image-upload"
                           type="file"
                           accept="image/jpeg,image/png,image/gif,image/webp"
                           className="hidden"
@@ -719,7 +719,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
                           {colorUploading === colorName ? "Uploading..." : "Pick colour image"}
                         </span>
                       </label>
-                      <input
+                      <input name="product-color-image"
                         value={entry?.image || ""}
                         onChange={(e) => {
                           const url = e.target.value.trim();
@@ -763,20 +763,20 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="New Arrival">
             <label className="flex items-center gap-3 py-2.5">
-              <input type="checkbox" checked={form.isNew} onChange={setCheck("isNew")} className="accent-[#d4af37] w-4 h-4" />
+              <input name="product-new-arrival" type="checkbox" checked={form.isNew} onChange={setCheck("isNew")} className="accent-[#d4af37] w-4 h-4" />
               <span className="text-sm">Mark as new arrival</span>
             </label>
             <p className="text-[10px] text-onyx/50">Also tick "Coming Soon" to announce a piece that is not yet purchasable.</p>
           </Field>
           <Field label="Coming Soon">
             <label className="flex items-center gap-3 py-2.5">
-              <input type="checkbox" checked={form.comingSoon} onChange={setCheck("comingSoon")} className="accent-[#d4af37] w-4 h-4" />
+              <input name="product-coming-soon" type="checkbox" checked={form.comingSoon} onChange={setCheck("comingSoon")} className="accent-[#d4af37] w-4 h-4" />
               <span className="text-sm">Show "Coming Soon" tag</span>
             </label>
           </Field>
           <Field label="Sold Out">
             <label className="flex items-center gap-3 py-2.5">
-              <input
+              <input name="product-sold-out"
                 type="checkbox"
                 checked={parseInt(form.stock, 10) === 0}
                 onChange={(e) => setForm((f) => ({ ...f, stock: e.target.checked ? "0" : f.stock === "0" ? "1" : f.stock }))}
@@ -787,17 +787,17 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
           </Field>
           <Field label="Best Seller">
             <label className="flex items-center gap-3 py-2.5">
-              <input type="checkbox" checked={!!form.featured} onChange={setCheck("featured")} className="accent-[#d4af37] w-4 h-4" />
+              <input name="product-featured" type="checkbox" checked={!!form.featured} onChange={setCheck("featured")} className="accent-[#d4af37] w-4 h-4" />
               <span className="text-sm">Feature in Bestsellers</span>
             </label>
             <p className="text-[10px] text-onyx/50">Shows this product in the Bestsellers section on the home page (max 12).</p>
           </Field>
         </div>
         <Field label="Description">
-          <textarea value={form.description} onChange={set("description")} rows={4} className={`${inputCls} resize-none`} />
+          <textarea name="product-description" value={form.description} onChange={set("description")} rows={4} className={`${inputCls} resize-none`} />
         </Field>
         <Field label="Card Blurb (shown on product cards & the Bestsellers section)">
-          <textarea
+          <textarea name="product-card-description"
             value={form.cardDescription}
             onChange={set("cardDescription")}
             rows={2}
@@ -912,7 +912,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
               </div>
             )}
 
-            <textarea
+            <textarea name="product-images"
               value={form.images}
               onChange={set("images")}
               rows={2}
@@ -927,7 +927,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
             card. Leave a line blank to keep that photo unnamed.
         ------------------------------------------------------------------ */}
         <Field label="Photo Labels (one per photo, same order as Images)">
-          <textarea
+          <textarea name="product-photo-labels"
             value={form.photoLabels}
             onChange={set("photoLabels")}
             rows={2}
@@ -1082,7 +1082,7 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
           <Modal onClose={() => { setFormOpen(false); setEditId(null); }} title={editId ? "Edit Category" : "Add Category"}>
             <form onSubmit={onSubmit} className="space-y-4">
               <Field label="Category Name">
-                <input
+                <input name="product-name"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   className={inputCls}
@@ -1090,7 +1090,7 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
                 />
               </Field>
               <Field label="Slug">
-                <input
+                <input name="product-slug"
                   value={form.slug}
                   onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
                   className={inputCls}
@@ -1098,7 +1098,7 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
                 />
               </Field>
               <Field label="Image URL (CLOUDINARY)">
-                <input
+                <input name="product-image"
                   value={form.image}
                   onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
                   className={`${inputCls} font-mono text-xs`}
@@ -1106,7 +1106,7 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
                 />
               </Field>
               <Field label="Slideshow Images (one URL per line)">
-                <textarea
+                <textarea name="product-images"
                   value={form.images}
                   onChange={(e) => setForm((f) => ({ ...f, images: e.target.value }))}
                   rows={4}
@@ -1118,7 +1118,7 @@ function CategoriesTab({ categories, refresh, formOpen, setFormOpen }) {
                 </p>
               </Field>
               <Field label="Section">
-                <select
+                <select name="product-gender"
                   value={form.gender}
                   onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
                   className={inputCls}
@@ -1217,7 +1217,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
             Fulfillment and payment are tracked separately
           </p>
         </div>
-        <select
+        <select name="order-status-filter"
           value={filters.status || ""}
           onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value || undefined }))}
           className="border border-onyx/10 bg-ivory px-3 py-2 text-xs focus:outline-none focus:border-gold"
@@ -1227,7 +1227,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
             <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
           ))}
         </select>
-        <select
+        <select name="payment-status-filter"
           value={filters.payment || ""}
           onChange={(e) => setFilters((f) => ({ ...f, payment: e.target.value || undefined }))}
           className="border border-onyx/10 bg-ivory px-3 py-2 text-xs focus:outline-none focus:border-gold"
@@ -1262,7 +1262,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                 <div className="flex flex-wrap items-end gap-3">
                   <label className="flex flex-col gap-1">
                     <span className="text-[9px] tracking-[0.16em] uppercase text-onyx/45">Order status</span>
-                    <select
+                    <select name="order-status"
                       value={order.orderStatus || "pending"}
                       onChange={(e) => updateStatus(order._id, "orderStatus", e.target.value)}
                       className={`border px-3 py-2 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.orderStatus, "order")}`}
@@ -1272,7 +1272,7 @@ function OrdersTab({ orders, refresh, filters, setFilters }) {
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-[9px] tracking-[0.16em] uppercase text-onyx/45">Payment status</span>
-                    <select
+                    <select name="order-payment-status"
                       value={order.paymentStatus || "pending"}
                       onChange={(e) => updateStatus(order._id, "paymentStatus", e.target.value)}
                       className={`border px-3 py-2 text-[10px] tracking-[0.12em] uppercase focus:outline-none focus:border-gold ${statusClass(order.paymentStatus, "payment")}`}
@@ -1527,7 +1527,7 @@ function CouponsTab({ coupons, refresh, formOpen, setFormOpen }) {
           <Modal onClose={() => setFormOpen(false)} title="Add Coupon">
             <form onSubmit={onSubmit} className="space-y-4">
               <Field label="Coupon Code">
-                <input
+                <input name="promo-code"
                   value={form.code}
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
                   className={`${inputCls} font-mono uppercase`}
@@ -1536,7 +1536,7 @@ function CouponsTab({ coupons, refresh, formOpen, setFormOpen }) {
               </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Discount">
-                  <input
+                  <input name="promo-discount"
                     type="number"
                     step="0.01"
                     value={form.discount}
@@ -1546,7 +1546,7 @@ function CouponsTab({ coupons, refresh, formOpen, setFormOpen }) {
                   />
                 </Field>
                 <Field label="Type">
-                  <select
+                  <select name="promo-type"
                     value={form.type}
                     onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
                     className={inputCls}
@@ -1557,7 +1557,7 @@ function CouponsTab({ coupons, refresh, formOpen, setFormOpen }) {
                 </Field>
               </div>
               <Field label="Minimum Order (optional)">
-                <input
+                <input name="promo-minimum-order"
                   type="number"
                   step="0.01"
                   value={form.minOrder}
@@ -1878,7 +1878,7 @@ function SettingsTab() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Contact Email">
-              <input
+              <input name="contact-email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
                 className={inputCls}
@@ -1886,7 +1886,7 @@ function SettingsTab() {
               />
             </Field>
             <Field label="Instagram URL">
-              <input
+              <input name="instagram-url"
                 value={instagramUrl}
                 onChange={(e) => setInstagramUrl(e.target.value)}
                 className={inputCls}
@@ -1896,7 +1896,7 @@ function SettingsTab() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <Field label="Instagram Handle (without @)">
-              <input
+              <input name="instagram-handle"
                 value={instagramHandle}
                 onChange={(e) => setInstagramHandle(e.target.value)}
                 className={inputCls}
@@ -1919,7 +1919,7 @@ function SettingsTab() {
           </p>
 
           <Field label="Hero Ribbon Words (comma separated)">
-            <textarea
+            <textarea name="marquee-words"
               value={wordsText}
               onChange={(e) => setWordsText(e.target.value)}
               rows={3}
@@ -1948,7 +1948,7 @@ function SettingsTab() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Slide Background Image URL *">
-                    <input
+                    <input name="slide-background"
                       value={slide.bg}
                       onChange={(e) => updateSlide(index, { bg: e.target.value })}
                       className={inputCls}
@@ -1956,7 +1956,7 @@ function SettingsTab() {
                     />
                   </Field>
                   <Field label="Small Label (optional)">
-                    <input
+                    <input name="slide-eyebrow"
                       value={slide.eyebrow}
                       onChange={(e) => updateSlide(index, { eyebrow: e.target.value })}
                       className={inputCls}
@@ -1995,7 +1995,7 @@ function SettingsTab() {
 
           <div className="space-y-4">
             <Field label="Backdrop Images (one per line or comma separated)">
-              <textarea
+              <textarea name="bestseller-images"
                 value={bestsellersImagesText}
                 onChange={(e) => setBestsellersImagesText(e.target.value)}
                 rows={4}
@@ -2020,7 +2020,7 @@ function SettingsTab() {
 
           <div className="space-y-4">
             <Field label="Hero Subtitle">
-              <input
+              <input name="about-hero-subtitle"
                 value={about.aboutHeroSubtitle}
                 onChange={(e) => updateAboutField("aboutHeroSubtitle", e.target.value)}
                 className={inputCls}
@@ -2028,7 +2028,7 @@ function SettingsTab() {
               />
             </Field>
             <Field label="Our Heritage - Heading">
-              <input
+              <input name="about-story-title"
                 value={about.aboutStoryTitle}
                 onChange={(e) => updateAboutField("aboutStoryTitle", e.target.value)}
                 className={inputCls}
@@ -2036,7 +2036,7 @@ function SettingsTab() {
               />
             </Field>
             <Field label="Our Heritage - Intro Paragraph">
-              <textarea
+              <textarea name="about-story-intro"
                 value={about.aboutStoryIntro}
                 onChange={(e) => updateAboutField("aboutStoryIntro", e.target.value)}
                 rows={4}
@@ -2045,7 +2045,7 @@ function SettingsTab() {
               />
             </Field>
             <Field label="Our Heritage - Body Paragraph">
-              <textarea
+              <textarea name="about-story-body"
                 value={about.aboutStoryBody}
                 onChange={(e) => updateAboutField("aboutStoryBody", e.target.value)}
                 rows={4}
@@ -2054,7 +2054,7 @@ function SettingsTab() {
               />
             </Field>
             <Field label="Our Heritage - Closing Line">
-              <input
+              <input name="about-story-closing"
                 value={about.aboutStoryClosing}
                 onChange={(e) => updateAboutField("aboutStoryClosing", e.target.value)}
                 className={inputCls}
@@ -2070,7 +2070,7 @@ function SettingsTab() {
                 <p className="text-[10px] text-onyx/50 tracking-[0.18em] uppercase mb-3">Value {index + 1}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Title">
-                    <input
+                    <input name="about-value-title"
                       value={value.title}
                       onChange={(e) => updateAboutValue(index, { title: e.target.value })}
                       className={inputCls}
@@ -2078,7 +2078,7 @@ function SettingsTab() {
                     />
                   </Field>
                   <Field label="Description">
-                    <input
+                    <input name="about-value-description"
                       value={value.text}
                       onChange={(e) => updateAboutValue(index, { text: e.target.value })}
                       className={inputCls}
@@ -2092,7 +2092,7 @@ function SettingsTab() {
 
           <div className="mt-6">
             <Field label="The Atelier - Heading">
-              <input
+              <input name="about-atelier-title"
                 value={about.aboutAtelierTitle}
                 onChange={(e) => updateAboutField("aboutAtelierTitle", e.target.value)}
                 className={inputCls}

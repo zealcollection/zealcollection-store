@@ -635,7 +635,7 @@ export default function Navbar() {
                     size={15}
                     className="absolute left-0 top-1/2 -translate-y-1/2 text-gold/70"
                   />
-                  <input
+                  <input name="search"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     placeholder="Search the collection..."
@@ -723,7 +723,7 @@ export default function Navbar() {
                   size={20}
                   className="absolute left-5 top-1/2 -translate-y-1/2 text-gold"
                 />
-                <input
+                <input name="search"
                   autoFocus
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}

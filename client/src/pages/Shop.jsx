@@ -267,7 +267,7 @@ export default function Shop() {
           <div className="flex items-center gap-3">
             <div className="relative flex-1 md:w-80">
               <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-onyx/40" />
-              <input
+              <input name="product-search"
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -300,7 +300,7 @@ export default function Shop() {
 
           <div className="relative w-full md:w-auto">
             <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-onyx/50 pointer-events-none" />
-            <select
+            <select name="product-sort"
               value={sort}
               onChange={(e) => setSort(e.target.value)}
               aria-label="Sort products"

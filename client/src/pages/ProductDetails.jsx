@@ -627,13 +627,13 @@ export default function ProductDetails() {
                             </button>
                           ))}
                         </div>
-                        <input
+                        <input name="review-title"
                           value={reviewTitle}
                           onChange={(e) => setReviewTitle(e.target.value)}
                           placeholder="Review title (optional)"
                           className="w-full border border-mist px-4 py-3 text-sm mb-3 focus:outline-none focus:border-gold"
                         />
-                        <textarea
+                        <textarea name="review-comment"
                           value={reviewComment}
                           onChange={(e) => setReviewComment(e.target.value)}
                           placeholder="Share your experience with this piece"

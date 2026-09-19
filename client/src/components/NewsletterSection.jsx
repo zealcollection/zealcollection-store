@@ -65,7 +65,7 @@ export default function NewsletterSection() {
           onSubmit={handleSubmit}
           className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto"
         >
-          <input
+          <input name="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
