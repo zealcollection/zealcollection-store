@@ -119,6 +119,24 @@ export default function Navbar() {
     return () => document.removeEventListener("click", closeAll);
   }, []);
 
+  // Keep the page fixed while the drawer is open and let Escape close it on
+  // keyboards, iOS keyboards, Android browsers, and foldable devices.
+  useEffect(() => {
+    if (!drawerOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setDrawerOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [drawerOpen]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) {
@@ -126,6 +144,13 @@ export default function Navbar() {
     }
     setSearchOpen(false);
     setSearchInput("");
+  };
+
+  const closeDrawer = () => setDrawerOpen(false);
+  const navigateFromDrawer = (event, path) => {
+    event.preventDefault();
+    closeDrawer();
+    navigate(path);
   };
 
   const solid = scrolled;
@@ -142,7 +167,7 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 ${
+        className={`navbar-shell fixed top-0 left-0 right-0 z-[70] select-none ${
           solid
             ? "bg-ivory/85 backdrop-blur-md shadow-md"
             : "bg-transparent"
@@ -151,9 +176,9 @@ export default function Navbar() {
           transition: "background-color 0.3s ease, backdrop-filter 0.3s ease",
         }}
       >
-        <nav className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8">
+        <nav className="navbar-inner max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8">
           {/* Mobile: two cells only - hamburger left, centered logo. Everything else lives in the drawer. */}
-          <div className="grid grid-cols-3 items-center gap-1 min-w-0 py-3 md:py-4">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 min-w-0 py-2.5 sm:py-3 lg:py-4">
             {/* Left cell: mobile menu button + desktop links */}
             <div className="flex items-center justify-center justify-self-start min-w-0">
               {/* Mobile menu button */}
@@ -161,13 +186,14 @@ export default function Navbar() {
                 type="button"
                 aria-label="Open menu"
                 onClick={() => setDrawerOpen(true)}
-                className={`block md:hidden p-2.5 shrink-0 transition-colors ${
+                aria-expanded={drawerOpen}
+                className={`flex lg:hidden h-11 w-11 items-center justify-center rounded-full shrink-0 transition-all touch-manipulation active:scale-95 ${
                   solid ? "text-onyx" : "text-ivory"
                 }`}
               >
-                <Menu size={26} />
+                <Menu size={23} strokeWidth={1.8} />
               </button>
-              <ul className="hidden lg:flex items-center gap-7 whitespace-nowrap">
+              <ul className="hidden lg:flex items-center gap-6 xl:gap-7 whitespace-nowrap">
               <li>
                 <Link to="/" className={linkClass("/")}>
                   Home
@@ -367,12 +393,12 @@ export default function Navbar() {
               <img
                 src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
                 alt={`${BRAND_NAME} luxury logo`}
-                className="navbar-logo h-24 sm:h-20 md:h-40 w-auto max-w-full object-contain scale-[1.35] sm:scale-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]"
+                className="navbar-logo h-16 sm:h-20 lg:h-32 xl:h-36 w-auto max-w-[150px] sm:max-w-[190px] object-contain scale-110 sm:scale-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]"
               />
             </Link>
 
             {/* Right cell: Contact link + icons - icons stay compact and never wrap */}
-            <div className="flex items-center justify-center justify-self-end gap-3 md:gap-5 min-w-0">
+            <div className="flex items-center justify-center justify-self-end gap-1 sm:gap-2 lg:gap-4 xl:gap-5 min-w-0">
               <Link
                 to="/contact"
                 className={`hidden lg:inline-block text-[15px] tracking-[0.15em] uppercase font-semibold transition-colors duration-300 ${
@@ -402,21 +428,21 @@ export default function Navbar() {
                 type="button"
                 aria-label="Open search"
                 onClick={() => setSearchOpen(true)}
-                className={`hidden md:block p-2.5 transition-colors ${
+                className={`hidden lg:flex h-11 w-11 items-center justify-center rounded-full transition-colors touch-manipulation ${
                   solid ? "text-onyx hover:text-gold-dark" : "text-ivory hover:text-gold"
                 }`}
               >
-                <Search size={24} />
+                <Search size={21} strokeWidth={1.8} />
               </button>
 
               <Link
                 to="/wishlist"
                 aria-label="Open wishlist"
-                className={`relative hidden md:block p-2.5 transition-colors ${
+                className={`relative hidden lg:flex h-11 w-11 items-center justify-center rounded-full transition-colors touch-manipulation ${
                   solid ? "text-onyx hover:text-gold-dark" : "text-ivory hover:text-gold"
                 }`}
               >
-                <Heart size={24} />
+                <Heart size={21} strokeWidth={1.8} />
                 {wishlistItems.length > 0 && (
                   <span className="absolute -top-0.5 right-0 bg-gold text-onyx text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
                     {wishlistItems.length}
@@ -429,7 +455,7 @@ export default function Navbar() {
                 <Link
                   to="/admin"
                   aria-label="Admin dashboard"
-                  className={`hidden md:block p-2.5 transition-colors ${
+                  className={`hidden lg:flex h-11 w-11 items-center justify-center rounded-full transition-colors touch-manipulation ${
                     location.pathname === "/admin"
                       ? "text-gold-dark"
                       : solid
@@ -438,25 +464,25 @@ export default function Navbar() {
                   }`}
                   title="Admin Dashboard"
                 >
-                  <ShieldCheck size={24} />
+                  <ShieldCheck size={21} strokeWidth={1.8} />
                 </Link>
               )}
 
               {/* Account: Only visible for logged-in admins to maintain guest-only feel for shoppers */}
               {isAuthenticated && auth?.user?.role === "admin" && (
                 <div
-                  className="relative hidden md:block"
+                  className="relative hidden lg:block"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     type="button"
                     aria-label="Open account menu"
                     onClick={() => setAccountMenuOpen((v) => !v)}
-                    className={`p-2.5 transition-colors ${
+                    className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors touch-manipulation ${
                       solid ? "text-onyx hover:text-gold-dark" : "text-ivory hover:text-gold"
                     }`}
                   >
-                    <User size={24} />
+                    <User size={21} strokeWidth={1.8} />
                   </button>
                   <AnimatePresence>
                     {accountMenuOpen && (
@@ -496,7 +522,7 @@ export default function Navbar() {
                 <Link
                   to="/admin"
                   aria-label="Open admin"
-                  className={`md:hidden p-2.5 shrink-0 transition-colors ${
+                  className={`hidden lg:block p-2.5 shrink-0 transition-colors ${
                     solid ? "text-onyx hover:text-gold-dark" : "text-ivory hover:text-gold"
                   }`}
                 >
@@ -508,11 +534,11 @@ export default function Navbar() {
               <Link
                 to="/cart"
                 aria-label="Open cart"
-                className={`relative p-2.5 transition-colors ${
+                className={`relative flex h-11 w-11 items-center justify-center rounded-full transition-colors touch-manipulation ${
                   solid ? "text-onyx hover:text-gold-dark" : "text-ivory hover:text-gold"
                 }`}
               >
-                <ShoppingBag size={24} />
+                <ShoppingBag size={21} strokeWidth={1.8} />
                 {cartTotals.itemCount > 0 && (
                   <span className="absolute -top-0.5 right-0 bg-gold text-onyx text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
                     {cartTotals.itemCount}
@@ -535,8 +561,8 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setDrawerOpen(false)}
-              className="fixed inset-0 z-50 bg-onyx/60 backdrop-blur-sm md:hidden"
+              onClick={closeDrawer}
+              className="fixed inset-0 z-[80] bg-onyx/60 backdrop-blur-sm lg:hidden"
             />
             {/* Drawer */}
             <motion.aside
@@ -544,35 +570,38 @@ export default function Navbar() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-24px", opacity: 0 }}
               transition={{ type: "tween", duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 left-0 bottom-0 z-50 w-[300px] max-w-[82vw] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto md:hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation"
+              className="mobile-drawer fixed top-0 left-0 bottom-0 z-[81] w-[min(360px,88vw)] max-w-full rounded-r-[2rem] bg-onyx border-r border-gold/15 shadow-2xl overflow-y-auto overscroll-contain lg:hidden"
             >
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05, duration: 0.35 }}
-                className="flex flex-col items-center gap-4 px-7 py-6 border-b border-gold/20"
+                className="relative flex flex-col items-center gap-4 px-6 pb-6 pt-[calc(env(safe-area-inset-top)+1.25rem)] border-b border-gold/20"
               >
                 <img
                   src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
                   alt={`${BRAND_NAME} logo`}
-                  className="h-24 w-auto max-w-[190px] object-contain scale-[1.45] drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+                  className="h-20 w-auto max-w-[170px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
                 />
                 <button
                   type="button"
                   aria-label="Close menu"
-                  onClick={() => setDrawerOpen(false)}
-                  className="p-2 text-gold/80 hover:text-gold transition-colors self-end -mt-16"
+                  onClick={closeDrawer}
+                  className="absolute right-4 top-[calc(env(safe-area-inset-top)+1rem)] z-10 flex h-12 w-12 items-center justify-center rounded-full border border-gold/20 bg-gold/5 text-gold/80 hover:bg-gold/10 hover:text-gold transition-colors touch-manipulation active:scale-95"
                 >
                   <X size={18} />
                 </button>
               </motion.div>
 
-              <nav className="px-7 py-7 pb-32">
+              <nav className="px-6 py-7 pb-[calc(env(safe-area-inset-bottom)+2rem)] sm:px-8">
                 {/* Collection header */}
                 <p className="text-[10px] tracking-[0.3em] uppercase text-gold/70 mb-4">
                   The Collection
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-1">
                   {[...drawerLinks].map((link, index) => (
                     <motion.li
                       key={link.path}
@@ -582,13 +611,13 @@ export default function Navbar() {
                     >
                       <Link
                         to={link.path}
-                        onClick={() => setDrawerOpen(false)}
-                        className="block py-1.5 font-display text-[17px] text-gold/90 hover:text-gold transition-colors"
+                        onClick={(event) => navigateFromDrawer(event, link.path)}
+                        className="flex min-h-12 items-center justify-between rounded-xl px-4 py-2 font-display text-[18px] text-gold/90 hover:bg-gold/10 hover:text-gold transition-colors touch-manipulation active:bg-gold/15"
                         style={{ letterSpacing: "0.02em" }}
                       >
                         {link.label}
                       </Link>
-                      <div className="h-px bg-gold/10 mt-3" />
+                      <div className="h-px bg-gold/10 mx-4" />
                     </motion.li>
                   ))}
                 </ul>
@@ -599,12 +628,13 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.12 + (drawerLinks.length) * 0.05 + 0.08, duration: 0.35 }}
                   onSubmit={(e) => {
+                    e.preventDefault();
                     if (searchInput.trim()) {
                       navigate(`/shop?search=${encodeURIComponent(searchInput.trim())}`);
                       setDrawerOpen(false);
                     }
                   }}
-                  className="relative mt-9"
+                  className="relative mt-9 rounded-2xl border border-gold/15 bg-white/[0.03] px-4 focus-within:border-gold/40"
                 >
                   <Search
                     size={15}
@@ -615,7 +645,7 @@ export default function Navbar() {
                     onChange={(e) => setSearchInput(e.target.value)}
                     placeholder="Search the collection..."
                     aria-label="Search"
-                    className="w-full bg-onyx border-b border-gold/40 text-gold/90 py-3 pl-7 pr-4 text-sm font-light focus:outline-none placeholder:text-ivory/35"
+                    className="w-full bg-transparent text-gold/90 py-3 pl-7 pr-4 text-sm font-light focus:outline-none placeholder:text-ivory/35"
                   />
                 </motion.form>
 
@@ -634,6 +664,7 @@ export default function Navbar() {
                   </p>
                   <Link
                     to="/wishlist"
+                    onClick={(event) => navigateFromDrawer(event, "/wishlist")}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
@@ -648,6 +679,7 @@ export default function Navbar() {
                   {isAuthenticated && auth?.user?.role === "admin" && (
                     <Link
                       to="/admin"
+                      onClick={(event) => navigateFromDrawer(event, "/admin")}
                       className="flex items-center gap-3 py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                     >
                       <ShieldCheck size={14} className="text-gold" /> Admin Dashboard
@@ -655,6 +687,7 @@ export default function Navbar() {
                   )}
                   <Link
                     to="/cart"
+                    onClick={(event) => navigateFromDrawer(event, "/cart")}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
@@ -682,7 +715,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-onyx/90 flex items-start justify-center pt-32 px-4"
+            className="fixed inset-0 z-[90] bg-onyx/90 flex items-start justify-center pt-32 px-4"
           >
             <motion.div
               initial={{ y: -24, opacity: 0 }}

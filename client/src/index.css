@@ -338,3 +338,48 @@
     bottom: 0.25rem;
   }
 }
+
+
+/* Responsive storefront navigation: safe on iOS, Android, tablets, and foldable widths. */
+.navbar-shell {
+  padding-top: env(safe-area-inset-top);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-inner {
+  min-height: clamp(4.25rem, 8vw, 6rem);
+}
+
+.mobile-drawer {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(224, 182, 71, 0.45) transparent;
+}
+
+@media (max-width: 1023px) {
+  .navbar-shell {
+    background: linear-gradient(180deg, rgba(15, 15, 15, 0.28), transparent);
+  }
+
+  .navbar-shell.bg-ivory\/85 {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar-shell {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-shell,
+  .mobile-drawer,
+  .mobile-drawer * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
