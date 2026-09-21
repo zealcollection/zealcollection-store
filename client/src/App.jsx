@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -319,9 +319,7 @@ export default function App() {
         }}
         visibleToasts={3}
       />
-      <Suspense fallback={null}>
-        <RouterProvider router={router} />
-      </Suspense>
+      <RouterProvider router={router} />
     </AppProvider>
   );
 }

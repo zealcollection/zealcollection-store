@@ -148,6 +148,13 @@ export default function Navbar() {
 
   const closeDrawer = () => setDrawerOpen(false);
 
+  const navigateFromDrawer = (event, path) => {
+    event.preventDefault();
+    event.stopPropagation();
+    closeDrawer();
+    navigate(path);
+  };
+
   const solid = scrolled;
 
   const linkClass = (path) =>
@@ -606,7 +613,7 @@ export default function Navbar() {
                     >
                       <Link
                         to={link.path}
-                        onClick={closeDrawer}
+                        onClick={(event) => navigateFromDrawer(event, link.path)}
                         className="flex min-h-12 items-center justify-between rounded-xl px-4 py-2 font-display text-[18px] text-gold/90 hover:bg-gold/10 hover:text-gold transition-colors touch-manipulation active:bg-gold/15"
                         style={{ letterSpacing: "0.02em" }}
                       >
@@ -659,7 +666,7 @@ export default function Navbar() {
                   </p>
                   <Link
                     to="/wishlist"
-                    onClick={closeDrawer}
+                    onClick={(event) => navigateFromDrawer(event, "/wishlist")}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
@@ -674,7 +681,7 @@ export default function Navbar() {
                   {isAuthenticated && auth?.user?.role === "admin" && (
                     <Link
                       to="/admin"
-                      onClick={closeDrawer}
+                      onClick={(event) => navigateFromDrawer(event, "/admin")}
                       className="flex items-center gap-3 py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                     >
                       <ShieldCheck size={14} className="text-gold" /> Admin Dashboard
@@ -682,7 +689,7 @@ export default function Navbar() {
                   )}
                   <Link
                     to="/cart"
-                    onClick={closeDrawer}
+                    onClick={(event) => navigateFromDrawer(event, "/cart")}
                     className="flex items-center justify-between py-3 border-b border-gold/10 text-[11px] tracking-[0.2em] uppercase text-gold/75 hover:text-gold transition-colors"
                   >
                     <span className="flex items-center gap-3">
