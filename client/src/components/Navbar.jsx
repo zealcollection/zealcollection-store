@@ -586,7 +586,7 @@ export default function Navbar() {
                 <img
                   src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
                   alt={`${BRAND_NAME} logo`}
-                  className="h-20 w-auto max-w-[170px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
+                  className="h-24 w-auto max-w-[200px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]"
                 />
                 <button
                   type="button"
