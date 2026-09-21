@@ -395,7 +395,7 @@ export default function Navbar() {
               <img
                 src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
                 alt={`${BRAND_NAME} luxury logo`}
-                className="navbar-logo h-16 sm:h-20 lg:h-36 xl:h-40 w-auto max-w-[150px] sm:max-w-[210px] object-contain scale-110 sm:scale-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]"
+                className="navbar-logo h-24 sm:h-20 lg:h-36 xl:h-40 w-auto max-w-[150px] sm:max-w-[210px] object-contain scale-[1.35] sm:scale-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]"
               />
             </Link>
 
