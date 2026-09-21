@@ -395,7 +395,7 @@ export default function Navbar() {
               <img
                 src={BRAND_LOGO_URL || LOCAL_LOGO_SRC}
                 alt={`${BRAND_NAME} luxury logo`}
-                className="navbar-logo h-16 sm:h-20 lg:h-32 xl:h-36 w-auto max-w-[150px] sm:max-w-[190px] object-contain scale-110 sm:scale-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]"
+                className="navbar-logo h-16 sm:h-20 lg:h-36 xl:h-40 w-auto max-w-[150px] sm:max-w-[210px] object-contain scale-110 sm:scale-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]"
               />
             </Link>
 
@@ -415,7 +415,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/track-order"
-                className={`hidden xl:inline-block text-[13px] tracking-[0.12em] uppercase font-semibold transition-colors ${
+                className={`hidden xl:inline-block whitespace-nowrap text-[13px] tracking-[0.12em] uppercase font-semibold transition-colors ${
                   location.pathname === "/track-order"
                     ? "text-gold-dark"
                     : solid
